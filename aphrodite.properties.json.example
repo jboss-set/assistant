@@ -1,5 +1,4 @@
 {
-    "maxThreadCount": "10",
     "issueTrackerConfigs": [
         {
             "url": "https://issues.jboss.org/",
@@ -8,13 +7,13 @@
             "tracker": "JIRA",
             "defaultIssueLimit": 1
         },
-        {
-			"url": "https://bugzilla.redhat.com/",
-			"username": "user",
-			"password": "pass",
-			"tracker": "BUGZILLA",
-			"defaultIssueLimit": 1
-		}
+	{
+            "url": "https://bugzilla.redhat.com/",
+            "username": "user",
+            "password": "pass",
+            "tracker": "BUGZILLA",
+            "defaultIssueLimit": 1
+        }
     ],
     "repositoryConfigs": [
         {
@@ -22,6 +21,12 @@
             "username": "user",
             "password": "pass",
             "type": "GITHUB"
+        }
+    ],
+    "streamConfigs": [
+        {
+            "file": "...",
+            "type": "JSON"
         }
     ]
 }

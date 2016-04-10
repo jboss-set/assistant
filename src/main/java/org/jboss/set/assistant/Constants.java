@@ -20,20 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.set;
+package org.jboss.set.assistant;
 
-/**
- * @author wangc
- *
- */
-public class Main {
+import java.util.regex.Pattern;
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
+public class Constants {
 
-    }
+    public static final Pattern UPSTREAM_NOT_REQUIRED = Pattern.compile(".*no.*upstream.*required.*", Pattern.CASE_INSENSITIVE);
 
 }
