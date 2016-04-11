@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Repository;
+import org.jboss.set.aphrodite.domain.StreamComponent;
 import org.jboss.set.aphrodite.spi.StreamService;
 import org.jboss.set.assistant.data.LinkData;
 import org.jboss.set.assistant.evaluator.Evaluator;
@@ -47,7 +48,8 @@ public class RepositoryEvaluator implements Evaluator {
         Repository repository = context.getRepository();
         StreamService streamService = context.getStreamService();
         Patch patch = context.getPatch();
-        String componentName = streamService.findComponentNameBy(patch.getRepository(), patch.getCodebase());
+        StreamComponent streamComponent = streamService.getComponentBy(patch.getRepository(), patch.getCodebase());
+        String componentName = streamComponent.getName();
         data.put("repository", new LinkData(componentName, repository.getURL()));
     }
 

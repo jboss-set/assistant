@@ -52,7 +52,7 @@ public class PullRequestRelatedEvaluator implements Evaluator {
 
         List<PullRequestData> links = new ArrayList<>();
         for (Patch patch : relatedPatches) {
-            List<Stream> streams = service.findStreamsBy(patch.getRepository(), patch.getCodebase());
+            List<Stream> streams = service.getStreamsBy(patch.getRepository(), patch.getCodebase());
             List<String> streamsStr = streams.stream().map(e -> e.getName()).collect(Collectors.toList());
 
             links.add(new PullRequestData(patch.getId(), streamsStr, patch.getURL()));

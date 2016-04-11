@@ -49,7 +49,7 @@ public class StreamsEvaluator implements Evaluator {
         StreamService service = context.getStreamService();
         Patch patch = context.getPatch();
 
-        List<Stream> stream = service.findStreamsBy(patch.getRepository(), patch.getCodebase());
+        List<Stream> stream = service.getStreamsBy(patch.getRepository(), patch.getCodebase());
         List<String> streamsStr = stream.stream().map(e -> e.getName()).collect(Collectors.toList());
         data.put("streams", streamsStr);
 

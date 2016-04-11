@@ -59,7 +59,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
 
         StreamService service = context.getStreamService();
         Patch patch = context.getPatch();
-        List<String> streams = service.findStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
+        List<String> streams = service.getStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
                 .collect(Collectors.toList());
 
         data.put("issuesRelated", issues.stream()
