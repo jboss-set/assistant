@@ -28,7 +28,6 @@ import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Repository;
-import org.jboss.set.aphrodite.spi.StreamService;
 
 /**
  * @author egonzalez
@@ -36,8 +35,6 @@ import org.jboss.set.aphrodite.spi.StreamService;
  */
 public class EvaluatorContext {
     private Aphrodite aphrodite;
-
-    private StreamService streamService;
 
     private Patch patch;
 
@@ -47,10 +44,9 @@ public class EvaluatorContext {
 
     private Repository repository;
 
-    public EvaluatorContext(Aphrodite aphrodite, StreamService streamService, Repository repository, Patch patch,
+    public EvaluatorContext(Aphrodite aphrodite, Repository repository, Patch patch,
             List<Issue> issues, List<Patch> related) {
         this.aphrodite = aphrodite;
-        this.streamService = streamService;
         this.patch = patch;
         this.issues = issues;
         this.related = related;
@@ -59,10 +55,6 @@ public class EvaluatorContext {
 
     public Aphrodite getAphrodite() {
         return aphrodite;
-    }
-
-    public StreamService getStreamService() {
-        return streamService;
     }
 
     public Patch getPatch() {

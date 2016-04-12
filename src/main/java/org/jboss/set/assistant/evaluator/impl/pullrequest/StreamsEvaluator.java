@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Stream;
-import org.jboss.set.aphrodite.spi.StreamService;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
 
@@ -46,10 +46,10 @@ public class StreamsEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
 
-        StreamService service = context.getStreamService();
+        Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
 
-        List<Stream> stream = service.getStreamsBy(patch.getRepository(), patch.getCodebase());
+        List<Stream> stream = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
         List<String> streamsStr = stream.stream().map(e -> e.getName()).collect(Collectors.toList());
         data.put("streams", streamsStr);
 

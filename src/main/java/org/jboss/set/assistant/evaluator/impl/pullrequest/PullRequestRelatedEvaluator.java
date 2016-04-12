@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Stream;
-import org.jboss.set.aphrodite.spi.StreamService;
 import org.jboss.set.assistant.data.PullRequestData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -48,11 +48,11 @@ public class PullRequestRelatedEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
         List<Patch> relatedPatches = context.getRelated();
-        StreamService service = context.getStreamService();
+        Aphrodite aphrodite = context.getAphrodite();
 
         List<PullRequestData> links = new ArrayList<>();
         for (Patch patch : relatedPatches) {
-            List<Stream> streams = service.getStreamsBy(patch.getRepository(), patch.getCodebase());
+            List<Stream> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
             List<String> streamsStr = streams.stream().map(e -> e.getName()).collect(Collectors.toList());
 
             links.add(new PullRequestData(patch.getId(), streamsStr, patch.getURL()));

@@ -23,11 +23,15 @@
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Repository;
 import org.jboss.set.aphrodite.domain.StreamComponent;
-import org.jboss.set.aphrodite.spi.StreamService;
+import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.data.LinkData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -38,6 +42,8 @@ import org.jboss.set.assistant.evaluator.EvaluatorContext;
  */
 public class RepositoryEvaluator implements Evaluator {
 
+    private static Logger logger = Logger.getLogger(RepositoryEvaluator.class.getCanonicalName());
+
     @Override
     public String name() {
         return "Repository evaluator";
@@ -46,11 +52,16 @@ public class RepositoryEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
         Repository repository = context.getRepository();
-        StreamService streamService = context.getStreamService();
+        Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
-        StreamComponent streamComponent = streamService.getComponentBy(patch.getRepository(), patch.getCodebase());
-        String componentName = streamComponent.getName();
-        data.put("repository", new LinkData(componentName, repository.getURL()));
+        StreamComponent streamComponent;
+        Optional<String> componentName = Optional.of("N/A");
+        try {
+            streamComponent = aphrodite.getComponentBy(patch.getRepository(), patch.getCodebase());
+            componentName = Optional.of(streamComponent.getName());
+        } catch (NotFoundException e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
+        }
+        data.put("repository", new LinkData(componentName.get(), repository.getURL()));
     }
-
 }

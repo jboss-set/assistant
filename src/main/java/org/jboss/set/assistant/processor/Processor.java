@@ -22,11 +22,10 @@
 
 package org.jboss.set.assistant.processor;
 
-import java.net.URL;
 import java.util.List;
 
 import org.jboss.set.aphrodite.Aphrodite;
-import org.jboss.set.aphrodite.spi.StreamService;
+import org.jboss.set.aphrodite.domain.Repository;
 import org.jboss.set.assistant.data.ProcessorData;
 
 /**
@@ -40,8 +39,8 @@ import org.jboss.set.assistant.data.ProcessorData;
  */
 public interface Processor {
 
-    void init(Aphrodite aphrodite, StreamService streamService) throws Exception;
+    void init(Aphrodite aphrodite) throws Exception;
 
-    List<ProcessorData> process(URL url) throws ProcessorException;
+    List<ProcessorData> process(Repository repository) throws ProcessorException;
 
 }

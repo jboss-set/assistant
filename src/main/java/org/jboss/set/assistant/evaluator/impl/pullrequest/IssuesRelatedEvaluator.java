@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
-import org.jboss.set.aphrodite.spi.StreamService;
 import org.jboss.set.assistant.data.IssueData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -57,9 +57,9 @@ public class IssuesRelatedEvaluator implements Evaluator {
             issueStream.put(issue.getTrackerId().get(), streams);
         }
 
-        StreamService service = context.getStreamService();
+        Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
-        List<String> streams = service.getStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
+        List<String> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
                 .collect(Collectors.toList());
 
         data.put("issuesRelated", issues.stream()
@@ -79,6 +79,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
                 })
                 .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL()))
                 .collect(Collectors.toList()));
+
     }
 
 }
