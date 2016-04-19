@@ -27,5 +27,6 @@ import java.util.regex.Pattern;
 public class Constants {
 
     public static final Pattern UPSTREAM_NOT_REQUIRED = Pattern.compile(".*no.*upstream.*required.*", Pattern.CASE_INSENSITIVE);
-
+    public static final Pattern RELATED_PR_PATTERN = Pattern
+            .compile(".*github\\.com.*?/([a-zA-Z_0-9-]*)/([a-zA-Z_0-9-]*)/pull.?/(\\d+)", Pattern.CASE_INSENSITIVE);
 }

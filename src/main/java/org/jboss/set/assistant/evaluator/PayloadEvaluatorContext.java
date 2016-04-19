@@ -23,6 +23,7 @@
 package org.jboss.set.assistant.evaluator;
 
 import org.jboss.set.aphrodite.Aphrodite;
+import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
 
 /**
@@ -33,10 +34,12 @@ public class PayloadEvaluatorContext {
 
     private Aphrodite aphrodite;
     private Issue issue;
+    private TrackerType trackerType;
 
-    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue) {
+    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, TrackerType trackerType) {
         this.aphrodite = aphrodite;
         this.issue = issue;
+        this.trackerType = trackerType;
     }
 
     public Aphrodite getAphrodite() {
@@ -45,5 +48,9 @@ public class PayloadEvaluatorContext {
 
     public Issue getIssue() {
         return issue;
+    }
+
+    public TrackerType getTrackerType() {
+        return trackerType;
     }
 }

@@ -22,17 +22,23 @@
 
 package org.jboss.set.assistant.evaluator.impl.payload;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 import org.jboss.set.aphrodite.Aphrodite;
+import org.jboss.set.aphrodite.config.TrackerType;
+import org.jboss.set.aphrodite.domain.Comment;
 import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.spi.NotFoundException;
+import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.AssociatedPullRequest;
 import org.jboss.set.assistant.evaluator.PayloadEvaluator;
 import org.jboss.set.assistant.evaluator.PayloadEvaluatorContext;
@@ -54,22 +60,51 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
 
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
-
         Issue dependencyIssue = context.getIssue();
         Aphrodite aphrodite = context.getAphrodite();
+        TrackerType trackerType = context.getTrackerType();
 
-        try {
-            List<Patch> patches = aphrodite.getPatchesAssociatedWith(dependencyIssue);
-            List<AssociatedPullRequest> dataList = new ArrayList<>();
+        List<URL> relatedPullRequestsURL = new ArrayList<>();
 
-            for (Patch p : patches) {
-                CommitStatus commitStatus = aphrodite.getCommitStatusFromPatch(p);
-                dataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.toString()));
-            }
-            data.put(KEY, dataList);
-
-        } catch (NotFoundException e) {
-            logger.log(Level.FINE, "Unable to find any associated Pull Request for issue : " + dependencyIssue.getURL(), e);
+        if (trackerType.equals(TrackerType.BUGZILLA)) {
+            // scan comments to get relevant pull request;
+            List<Comment> comments = dependencyIssue.getComments();
+            comments.stream().forEach(e -> {
+                Matcher matcher = Constants.RELATED_PR_PATTERN.matcher(e.getBody());
+                while (matcher.find()) {
+                    if (matcher.groupCount() == 3) {
+                        URL relatedPullRequestURL;
+                        try {
+                            relatedPullRequestURL = new URL("https://github.com/" + matcher.group(1) + "/" + matcher.group(2)
+                                    + "/pull/" + matcher.group(3));
+                            relatedPullRequestsURL.add(relatedPullRequestURL);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            });
+        } else {
+            // TODO based on pull request field value on JIRA
         }
+
+        List<AssociatedPullRequest> dataList = new ArrayList<>();
+        for (URL url : relatedPullRequestsURL) {
+            Patch p = null;
+            try {
+                p = aphrodite.getPatch(url);
+            } catch (NotFoundException e) {
+                logger.log(Level.WARNING, "Unable to find related Pull Request for issue: " + dependencyIssue.getURL(), e);
+            }
+            Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
+            try {
+                commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(p));
+            } catch (NotFoundException e) {
+                logger.log(Level.FINE, "Unable to find build result for pull request : " + url, e);
+            }
+            dataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString()));
+        }
+        data.put(KEY, dataList);
+
     }
 }
