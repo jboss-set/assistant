@@ -34,12 +34,14 @@ public class AssociatedPullRequest {
     private URL link;
     private String codebase;
     private String commitStatus;
+    private boolean noUpstreamRequired;
 
-    public AssociatedPullRequest(String label, URL link, String codebase, String commitStatus) {
+    public AssociatedPullRequest(String label, URL link, String codebase, String commitStatus, boolean noUpstreamRequired) {
         this.label = label;
         this.link = link;
         this.codebase = codebase;
         this.commitStatus = commitStatus;
+        this.noUpstreamRequired = noUpstreamRequired;
     }
 
     public String getLabel() {
@@ -56,5 +58,9 @@ public class AssociatedPullRequest {
 
     public String getCommitStatus() {
         return commitStatus;
+    }
+
+    public boolean isNoUpstreamRequired() {
+        return noUpstreamRequired;
     }
 }

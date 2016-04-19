@@ -91,8 +91,10 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         List<AssociatedPullRequest> dataList = new ArrayList<>();
         for (URL url : relatedPullRequestsURL) {
             Patch p = null;
+            boolean isNoUpstreamRequired = false;
             try {
                 p = aphrodite.getPatch(url);
+                isNoUpstreamRequired = this.isNoUpstreamRequired(p);
             } catch (NotFoundException e) {
                 logger.log(Level.WARNING, "Unable to find related Pull Request for issue: " + dependencyIssue.getURL(), e);
             }
@@ -102,9 +104,18 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
             } catch (NotFoundException e) {
                 logger.log(Level.FINE, "Unable to find build result for pull request : " + url, e);
             }
-            dataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString()));
+            dataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
         data.put(KEY, dataList);
 
+    }
+
+    private boolean isNoUpstreamRequired(Patch p) {
+        Optional<String> pullRequestBoday = Optional.ofNullable(p.getBody());
+        Matcher matcher = Constants.UPSTREAM_NOT_REQUIRED.matcher(pullRequestBoday.orElse("N/A"));
+        if (matcher.find())
+            return true;
+        else
+            return false;
     }
 }
