@@ -34,7 +34,7 @@ import org.jboss.set.assistant.data.ProcessorData;
  */
 public interface PayloadProcessor {
 
-    void init(Aphrodite aphrodite) throws Exception;
+    void init(Aphrodite aphrodite);
 
     List<ProcessorData> process(Issue issue) throws ProcessorException;
 
