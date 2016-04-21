@@ -23,6 +23,7 @@
 package org.jboss.set.assistant.data.payload;
 
 import java.net.URL;
+import java.util.Map;
 
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
@@ -40,11 +41,14 @@ public class DependencyIssue {
 
     private IssueType type;
 
-    public DependencyIssue(URL link, String label, IssueStatus status, IssueType type) {
+    private Map<String, String> flags;
+
+    public DependencyIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags) {
         this.link = link;
         this.label = label;
         this.status = status;
         this.type = type;
+        this.flags = flags;
     }
 
     public URL getLink() {
@@ -61,5 +65,9 @@ public class DependencyIssue {
 
     public IssueType getType() {
         return type;
+    }
+
+    public Map<String, String> getFlags() {
+        return flags;
     }
 }
