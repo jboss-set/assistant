@@ -32,7 +32,7 @@ import org.jboss.set.aphrodite.domain.IssueType;
  * @author wangc
  *
  */
-public class DependencyIssue {
+public class PayloadIssue {
     private URL link;
 
     private String label;
@@ -43,7 +43,7 @@ public class DependencyIssue {
 
     private Map<String, String> flags;
 
-    public DependencyIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags) {
+    public PayloadIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags) {
         this.link = link;
         this.label = label;
         this.status = status;

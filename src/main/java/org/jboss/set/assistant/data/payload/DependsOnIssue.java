@@ -20,19 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.set.assistant;
+package org.jboss.set.assistant.data.payload;
 
-import java.util.regex.Pattern;
+import java.net.URL;
+import java.util.Map;
 
-public class Constants {
+import org.jboss.set.aphrodite.domain.IssueStatus;
+import org.jboss.set.aphrodite.domain.IssueType;
 
-    public static final Pattern UPSTREAM_NOT_REQUIRED = Pattern.compile(".*no.*upstream.*required.*", Pattern.CASE_INSENSITIVE);
-    public static final Pattern RELATED_PR_PATTERN = Pattern
-            .compile(".*github\\.com.*?/([a-zA-Z_0-9-]*)/([a-zA-Z_0-9-]*)/pull.?/(\\d+)", Pattern.CASE_INSENSITIVE);
+/**
+ * @author wangc
+ *
+ */
+public class DependsOnIssue extends PayloadIssue {
 
-    public static final Pattern BZ_ID_PARAM_PATTERN = Pattern.compile("id=([^&]+)");
+    private boolean inPayload;
 
-    public static final String API_BASE_PATH = "/rest/api/2/";
-    public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
-    public static final String BROWSE_ISSUE_PATH = "/browse/";
+    public DependsOnIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags, boolean inPayload) {
+        super(link, label, status, type, flags);
+        this.inPayload = inPayload;
+    }
+
+    public boolean isInPayload() {
+        return inPayload;
+    }
 }

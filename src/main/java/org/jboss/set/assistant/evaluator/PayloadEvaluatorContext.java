@@ -34,11 +34,13 @@ public class PayloadEvaluatorContext {
 
     private Aphrodite aphrodite;
     private Issue issue;
+    private Issue payloadTracker;
     private TrackerType trackerType;
 
-    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, TrackerType trackerType) {
+    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, Issue payloadTracker, TrackerType trackerType) {
         this.aphrodite = aphrodite;
         this.issue = issue;
+        this.payloadTracker = payloadTracker;
         this.trackerType = trackerType;
     }
 
@@ -48,6 +50,10 @@ public class PayloadEvaluatorContext {
 
     public Issue getIssue() {
         return issue;
+    }
+
+    public Issue getPayloadTracker() {
+        return payloadTracker;
     }
 
     public TrackerType getTrackerType() {
