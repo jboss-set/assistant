@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.common.Utils;
+import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
@@ -59,9 +60,6 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
-
-        Issue payloadTracker = context.getPayloadTracker();
-
         Aphrodite aphrodite = context.getAphrodite();
 
         Issue dependencyIssue = context.getIssue();
@@ -69,20 +67,40 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
         List<DependsOnIssue> dependsOnIssues = new ArrayList<>();
 
-        for (URL url : dependsOnURL) {
-            try {
-                Issue issue = aphrodite.getIssue(url);
-                boolean inPayload = issue.getBlocks().stream()
-                        .anyMatch(e -> extractId(e).equalsIgnoreCase(payloadTracker.getTrackerId().get())) || checkIsReleased(issue) || checkIssueType(issue);
-                dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getStatus(),
-                        issue.getType(), issue.getStage().getStateMap().entrySet().stream()
-                                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                        inPayload));
-            } catch (NotFoundException e) {
-                logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
+        if (context.getTrackerType().equals(TrackerType.BUGZILLA)) {
+            Issue payloadTracker = context.getPayloadTracker();
+            for (URL url : dependsOnURL) {
+                try {
+                    Issue issue = aphrodite.getIssue(url);
+                    boolean inPayload = issue.getBlocks().stream()
+                            .anyMatch(e -> extractId(e).equalsIgnoreCase(payloadTracker.getTrackerId().get()))
+                            || checkIsReleased(issue) || checkIssueType(issue);
+                    dependsOnIssues
+                            .add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getStatus(),
+                                    issue.getType(), issue.getStage().getStateMap().entrySet().stream()
+                                            .collect(Collectors.toMap(e -> String.valueOf(e.getKey()),
+                                                    e -> String.valueOf(e.getValue()))),
+                                    inPayload));
+                } catch (NotFoundException e) {
+                    logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
+                }
             }
-        }
+        } else {
+            for (URL url : dependsOnURL) {
+                try {
+                    Issue issue = aphrodite.getIssue(url);
+                    dependsOnIssues
+                            .add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getStatus(),
+                                    issue.getType(), issue.getStage().getStateMap().entrySet().stream()
+                                            .collect(Collectors.toMap(e -> String.valueOf(e.getKey()),
+                                                    e -> String.valueOf(e.getValue()))),
+                                    true));
+                } catch (NotFoundException e) {
+                    logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
+                }
+            }
 
+        }
         data.put(KEY, dependsOnIssues);
     }
 

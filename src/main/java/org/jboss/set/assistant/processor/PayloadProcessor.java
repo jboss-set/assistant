@@ -36,6 +36,10 @@ public interface PayloadProcessor {
 
     void init(Aphrodite aphrodite);
 
+    // EAP 6 + Bugzilla
     List<ProcessorData> process(Issue issue) throws ProcessorException;
+
+    // EAP 7 + Jira
+    List<ProcessorData> process(String fixVersion) throws ProcessorException;
 
 }
