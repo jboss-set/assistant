@@ -22,6 +22,7 @@
 
 package org.jboss.set.assistant.evaluator.impl.payload;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.jboss.set.aphrodite.domain.Comment;
 import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.issue.trackers.jira.JiraIssue;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.AssociatedPullRequest;
@@ -70,22 +72,18 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
             // scan comments to get relevant pull request;
             List<Comment> comments = dependencyIssue.getComments();
             comments.stream().forEach(e -> {
-                Matcher matcher = Constants.RELATED_PR_PATTERN.matcher(e.getBody());
-                while (matcher.find()) {
-                    if (matcher.groupCount() == 3) {
-                        URL relatedPullRequestURL;
-                        try {
-                            relatedPullRequestURL = new URL("https://github.com/" + matcher.group(1) + "/" + matcher.group(2)
-                                    + "/pull/" + matcher.group(3));
-                            relatedPullRequestsURL.add(relatedPullRequestURL);
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                }
+                extractPullRequest(relatedPullRequestsURL, e.getBody());
             });
         } else {
-            // TODO based on pull request field value on JIRA
+            // provided by https://github.com/jboss-set/aphrodite/issues/78
+            if (dependencyIssue instanceof JiraIssue) {
+                ((JiraIssue) dependencyIssue).getPullRequests().stream().forEach(e -> {
+                    // needed for case like https://issues.jboss.org/browse/JBEAP-3708
+                    extractPullRequest(relatedPullRequestsURL, e.toString());
+                });
+            } else {
+                logger.log(Level.SEVERE, "Error! Type of " + dependencyIssue.getURL() + "  is not JiraIssue");
+            }
         }
 
         List<AssociatedPullRequest> dataList = new ArrayList<>();
@@ -108,6 +106,22 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         }
         data.put(KEY, dataList);
 
+    }
+
+    private void extractPullRequest(List<URL> relatedPullRequestsURL, String url) {
+        Matcher matcher = Constants.RELATED_PR_PATTERN.matcher(url);
+        while (matcher.find()) {
+            if (matcher.groupCount() == 3) {
+                URL relatedPullRequestURL;
+                try {
+                    relatedPullRequestURL = new URL("https://github.com/" + matcher.group(1) + "/" + matcher.group(2)
+                            + "/pull/" + matcher.group(3));
+                } catch (MalformedURLException e) {
+                    throw new IllegalArgumentException("Invalid URL:" + url, e);
+                }
+                relatedPullRequestsURL.add(relatedPullRequestURL);
+            }
+        }
     }
 
     private boolean isNoUpstreamRequired(Patch p) {
