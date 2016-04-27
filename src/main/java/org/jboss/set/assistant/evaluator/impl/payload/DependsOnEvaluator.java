@@ -82,7 +82,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                                                     e -> String.valueOf(e.getValue()))),
                                     inPayload));
                 } catch (NotFoundException e) {
-                    logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
+                    logger.log(Level.FINE, "Unable to find depends on issue with " + url, e);
                 }
             }
         } else {
