@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
+import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.data.ProcessorData;
 
 /**
@@ -37,9 +38,9 @@ public interface PayloadProcessor {
     void init(Aphrodite aphrodite);
 
     // EAP 6 + Bugzilla
-    List<ProcessorData> process(Issue issue) throws ProcessorException;
+    List<ProcessorData> process(Issue issue, Stream stream) throws ProcessorException;
 
     // EAP 7 + Jira
-    List<ProcessorData> process(String fixVersion) throws ProcessorException;
+    List<ProcessorData> process(String fixVersion, Stream stream) throws ProcessorException;
 
 }

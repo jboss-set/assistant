@@ -25,6 +25,7 @@ package org.jboss.set.assistant.evaluator;
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
+import org.jboss.set.aphrodite.domain.Stream;
 
 /**
  * @author wangc
@@ -37,21 +38,24 @@ public class PayloadEvaluatorContext {
     private Issue payloadTracker;
     private String fixVersion;
     private TrackerType trackerType;
+    private Stream stream;
 
-    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, Issue payloadTracker, TrackerType trackerType) {
+    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, Issue payloadTracker, TrackerType trackerType, Stream stream) {
         this.aphrodite = aphrodite;
         this.issue = issue;
         this.payloadTracker = payloadTracker;
         this.fixVersion = null;
         this.trackerType = trackerType;
+        this.stream = stream;
     }
 
-    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, String fixVersion, TrackerType trackerType) {
+    public PayloadEvaluatorContext(Aphrodite aphrodite, Issue issue, String fixVersion, TrackerType trackerType, Stream stream) {
         this.aphrodite = aphrodite;
         this.issue = issue;
         this.payloadTracker = null;
         this.fixVersion = fixVersion;
         this.trackerType = trackerType;
+        this.stream = stream;
     }
 
     public Aphrodite getAphrodite() {
@@ -72,5 +76,9 @@ public class PayloadEvaluatorContext {
 
     public TrackerType getTrackerType() {
         return trackerType;
+    }
+
+    public Stream getStream() {
+        return stream;
     }
 }

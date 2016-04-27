@@ -34,10 +34,13 @@ import java.util.regex.Matcher;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.config.TrackerType;
+import org.jboss.set.aphrodite.domain.Codebase;
 import org.jboss.set.aphrodite.domain.Comment;
 import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.Repository;
+import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.aphrodite.issue.trackers.jira.JiraIssue;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
@@ -55,6 +58,8 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
 
     public static final String KEY = "associatedPullRequest";
 
+    public static final String KEY_UNRELATED = "associatedUnrelatedPullRequest";
+
     @Override
     public String name() {
         return "Associate PullRequest Evaluator";
@@ -65,63 +70,91 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         Issue dependencyIssue = context.getIssue();
         Aphrodite aphrodite = context.getAphrodite();
         TrackerType trackerType = context.getTrackerType();
+        Stream stream = context.getStream();
 
-        List<URL> relatedPullRequestsURL = new ArrayList<>();
+        List<Patch> relatedPullRequests = new ArrayList<>();
+        List<Patch> unrelatedPullRequests = new ArrayList<>();
 
         if (trackerType.equals(TrackerType.BUGZILLA)) {
             // scan comments to get relevant pull request;
             List<Comment> comments = dependencyIssue.getComments();
             comments.stream().forEach(e -> {
-                extractPullRequest(relatedPullRequestsURL, e.getBody());
+                extractPullRequest(aphrodite, stream, relatedPullRequests, unrelatedPullRequests, e.getBody());
             });
         } else {
             // provided by https://github.com/jboss-set/aphrodite/issues/78
             if (dependencyIssue instanceof JiraIssue) {
                 ((JiraIssue) dependencyIssue).getPullRequests().stream().forEach(e -> {
                     // needed for case like https://issues.jboss.org/browse/JBEAP-3708
-                    extractPullRequest(relatedPullRequestsURL, e.toString());
+                    extractPullRequest(aphrodite, stream, relatedPullRequests, unrelatedPullRequests, e.toString());
                 });
             } else {
                 logger.log(Level.SEVERE, "Error! Type of " + dependencyIssue.getURL() + "  is not JiraIssue");
             }
         }
 
-        List<AssociatedPullRequest> dataList = new ArrayList<>();
-        for (URL url : relatedPullRequestsURL) {
-            Patch p = null;
+        List<AssociatedPullRequest> relatedDataList = new ArrayList<>();
+        List<AssociatedPullRequest> unrelatedDataList = new ArrayList<>();
+
+        for (Patch p : relatedPullRequests) {
             boolean isNoUpstreamRequired = false;
-            try {
-                p = aphrodite.getPatch(url);
-                isNoUpstreamRequired = this.isNoUpstreamRequired(p);
-            } catch (NotFoundException e) {
-                logger.log(Level.WARNING, "Unable to find related Pull Request for issue: " + dependencyIssue.getURL(), e);
-            }
+            isNoUpstreamRequired = this.isNoUpstreamRequired(p);
             Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
             try {
                 commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(p));
             } catch (NotFoundException e) {
-                logger.log(Level.FINE, "Unable to find build result for pull request : " + url, e);
+                logger.log(Level.FINE, "Unable to find build result for pull request : " + p.getURL(), e);
             }
-            dataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
+            relatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
-        data.put(KEY, dataList);
+        data.put(KEY, relatedDataList);
 
+        for (Patch p : unrelatedPullRequests) {
+            boolean isNoUpstreamRequired = false;
+            isNoUpstreamRequired = this.isNoUpstreamRequired(p);
+            Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
+            try {
+                commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(p));
+            } catch (NotFoundException e) {
+                logger.log(Level.FINE, "Unable to find build result for pull request : " + p.getURL(), e);
+            }
+            unrelatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
+        }
+        data.put(KEY_UNRELATED, unrelatedDataList);
     }
 
-    private void extractPullRequest(List<URL> relatedPullRequestsURL, String url) {
+    private void extractPullRequest(Aphrodite aphrodite, Stream stream, List<Patch> relatedPullRequestsURL, List<Patch> unrelatedPullRequestsURL, String url) {
         Matcher matcher = Constants.RELATED_PR_PATTERN.matcher(url);
         while (matcher.find()) {
             if (matcher.groupCount() == 3) {
                 URL relatedPullRequestURL;
                 try {
-                    relatedPullRequestURL = new URL("https://github.com/" + matcher.group(1) + "/" + matcher.group(2)
-                            + "/pull/" + matcher.group(3));
+                    relatedPullRequestURL = new URL(
+                            "https://github.com/" + matcher.group(1) + "/" + matcher.group(2) + "/pull/" + matcher.group(3));
+                    Patch patch;
+                    try {
+                        patch = aphrodite.getPatch(relatedPullRequestURL);
+                        if (checkSameStream(patch, stream)) {
+                            relatedPullRequestsURL.add(patch);
+                        } else{
+                            unrelatedPullRequestsURL.add(patch);
+                        }
+                    } catch (NotFoundException e) {
+                        logger.log(Level.WARNING, "Unable to find related Pull Request for issue: " + relatedPullRequestURL, e);
+                    }
+
                 } catch (MalformedURLException e) {
                     throw new IllegalArgumentException("Invalid URL:" + url, e);
                 }
-                relatedPullRequestsURL.add(relatedPullRequestURL);
             }
         }
+    }
+
+    private boolean checkSameStream(Patch patch, Stream stream) {
+        Codebase codebase = patch.getCodebase();
+        Repository repository = patch.getRepository();
+        return stream.getAllComponents().stream()
+                .anyMatch(e -> e.getCodebase().equals(codebase) && e.getRepository().equals(repository));
     }
 
     private boolean isNoUpstreamRequired(Patch p) {
