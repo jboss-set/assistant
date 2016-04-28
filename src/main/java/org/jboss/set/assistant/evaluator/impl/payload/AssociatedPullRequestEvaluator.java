@@ -105,7 +105,7 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
             } catch (NotFoundException e) {
                 logger.log(Level.FINE, "Unable to find build result for pull request : " + p.getURL(), e);
             }
-            relatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
+            relatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), p.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
         data.put(KEY, relatedDataList);
 
@@ -118,7 +118,7 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
             } catch (NotFoundException e) {
                 logger.log(Level.FINE, "Unable to find build result for pull request : " + p.getURL(), e);
             }
-            unrelatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
+            unrelatedDataList.add(new AssociatedPullRequest(p.getId(), p.getURL(), p.getCodebase().getName(), p.getState().toString(),commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
         data.put(KEY_UNRELATED, unrelatedDataList);
     }

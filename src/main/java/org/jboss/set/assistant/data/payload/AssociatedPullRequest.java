@@ -33,13 +33,15 @@ public class AssociatedPullRequest {
     private String label;
     private URL link;
     private String codebase;
+    private String patchState;
     private String commitStatus;
     private boolean noUpstreamRequired;
 
-    public AssociatedPullRequest(String label, URL link, String codebase, String commitStatus, boolean noUpstreamRequired) {
+    public AssociatedPullRequest(String label, URL link, String codebase, String patchState, String commitStatus, boolean noUpstreamRequired) {
         this.label = label;
         this.link = link;
         this.codebase = codebase;
+        this.patchState = patchState;
         this.commitStatus = commitStatus;
         this.noUpstreamRequired = noUpstreamRequired;
     }
@@ -54,6 +56,10 @@ public class AssociatedPullRequest {
 
     public String getCodebase() {
         return codebase;
+    }
+
+    public String getPatchState() {
+        return patchState;
     }
 
     public String getCommitStatus() {
