@@ -37,6 +37,7 @@ import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
+import org.jboss.set.aphrodite.domain.Release;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.DependsOnIssue;
@@ -89,12 +90,12 @@ public class DependsOnEvaluator implements PayloadEvaluator {
             for (URL url : dependsOnURL) {
                 try {
                     Issue issue = aphrodite.getIssue(url);
-                    dependsOnIssues
-                            .add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getStatus(),
-                                    issue.getType(), issue.getStage().getStateMap().entrySet().stream()
-                                            .collect(Collectors.toMap(e -> String.valueOf(e.getKey()),
-                                                    e -> String.valueOf(e.getValue()))),
-                                    true));
+                    String fixVersion = context.getFixVersion();
+                    boolean inPayload = checkFixVersion(issue, fixVersion) || checkIsReleased(issue) || checkIssueType(issue);
+                    dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"),
+                            issue.getStatus(), issue.getType(), issue.getStage().getStateMap().entrySet().stream().collect(
+                                    Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                            inPayload));
                 } catch (NotFoundException e) {
                     logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
                 }
@@ -117,6 +118,17 @@ public class DependsOnEvaluator implements PayloadEvaluator {
     // one-off does not need to be included in payload
     private boolean checkIssueType(Issue issue) {
         return issue.getType().equals(IssueType.ONE_OFF);
+    }
+
+    private boolean checkFixVersion(Issue issue, String fixVersion) {
+        List<Release> releases = issue.getReleases();
+        return releases.stream().anyMatch(e -> {
+            if (e.getVersion().isPresent()) {
+                return e.getVersion().get().equalsIgnoreCase(fixVersion);
+            } else {
+                return false;
+            }
+        });
     }
 
     private String extractId(URL url) {
