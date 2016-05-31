@@ -20,22 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.set.assistant;
+package org.jboss.set.assistant.processor;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
-public class Constants {
+import org.jboss.set.aphrodite.domain.Repository;
+import org.jboss.set.aphrodite.domain.Stream;
+import org.jboss.set.assistant.data.ProcessorData;
 
-    public static final Pattern UPSTREAM_NOT_REQUIRED = Pattern.compile(".*no.*upstream.*required.*", Pattern.CASE_INSENSITIVE);
-    public static final Pattern RELATED_PR_PATTERN = Pattern
-            .compile(".*github\\.com.*?/([a-zA-Z_0-9-]*)/([a-zA-Z_0-9-]*)/pull.?/(\\d+)", Pattern.CASE_INSENSITIVE);
+public interface PullRequestProcessor extends Processor {
 
-    public static final Pattern BZ_ID_PARAM_PATTERN = Pattern.compile("id=([^&]+)");
-
-    public static final String API_BASE_PATH = "/rest/api/2/";
-    public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
-    public static final String BROWSE_ISSUE_PATH = "/browse/";
-
-    public static final String EAP7_STREAM_TARGET_RELEASE = "7.0.z.GA";
+    List<ProcessorData> process(Repository repository, Stream stream) throws ProcessorException;
 
 }

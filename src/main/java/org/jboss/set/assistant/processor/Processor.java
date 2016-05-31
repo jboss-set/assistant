@@ -22,11 +22,8 @@
 
 package org.jboss.set.assistant.processor;
 
-import java.util.List;
 
 import org.jboss.set.aphrodite.Aphrodite;
-import org.jboss.set.aphrodite.domain.Repository;
-import org.jboss.set.assistant.data.ProcessorData;
 
 /**
  * Pull request processor derived from Jason's pull-player. It checks all the open PRs whether they are merge-able and schedule
@@ -39,8 +36,6 @@ import org.jboss.set.assistant.data.ProcessorData;
  */
 public interface Processor {
 
-    void init(Aphrodite aphrodite) throws Exception;
-
-    List<ProcessorData> process(Repository repository) throws ProcessorException;
+    void init(Aphrodite aphrodite);
 
 }

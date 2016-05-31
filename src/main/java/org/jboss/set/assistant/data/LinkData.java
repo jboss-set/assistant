@@ -29,13 +29,12 @@ import java.net.URL;
  *
  */
 public class LinkData {
+    private String label;
     private URL link;
 
-    private String label;
-
     public LinkData(String label, URL link) {
-        this.link = link;
         this.label = label;
+        this.link = link;
     }
 
     public String getLabel() {

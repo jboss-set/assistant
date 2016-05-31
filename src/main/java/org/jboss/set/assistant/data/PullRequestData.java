@@ -30,16 +30,24 @@ import java.util.List;
  *
  */
 public class PullRequestData {
+
     private URL link;
-
     private String label;
-
     private List<String> streams;
+    private String codebase;
+    private String patchState;
+    private String commitStatus;
+    private boolean noUpstreamRequired;
 
-    public PullRequestData(String label, List<String> streams, URL link) {
+    public PullRequestData(String label, List<String> streams, URL link, String codebase, String patchState,
+            String commitStatus, boolean noUpstreamRequired) {
         this.link = link;
         this.label = label;
         this.streams = streams;
+        this.codebase = codebase;
+        this.patchState = patchState;
+        this.commitStatus = commitStatus;
+        this.noUpstreamRequired = noUpstreamRequired;
     }
 
     public String getLabel() {
@@ -53,4 +61,21 @@ public class PullRequestData {
     public URL getLink() {
         return link;
     }
+
+    public String getCodebase() {
+        return codebase;
+    }
+
+    public String getPatchState() {
+        return patchState;
+    }
+
+    public String getCommitStatus() {
+        return commitStatus;
+    }
+
+    public boolean isNoUpstreamRequired() {
+        return noUpstreamRequired;
+    }
+
 }

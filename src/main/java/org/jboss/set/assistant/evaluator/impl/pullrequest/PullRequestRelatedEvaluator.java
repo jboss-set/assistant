@@ -25,11 +25,18 @@ package org.jboss.set.assistant.evaluator.impl.pullrequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.jboss.set.aphrodite.Aphrodite;
+import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Stream;
+import org.jboss.set.aphrodite.spi.NotFoundException;
+import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.PullRequestData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -39,6 +46,8 @@ import org.jboss.set.assistant.evaluator.EvaluatorContext;
  *
  */
 public class PullRequestRelatedEvaluator implements Evaluator {
+
+    private static final Logger logger = Logger.getLogger(PullRequestRelatedEvaluator.class.getCanonicalName());
 
     @Override
     public String name() {
@@ -55,11 +64,29 @@ public class PullRequestRelatedEvaluator implements Evaluator {
             List<Stream> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
             List<String> streamsStr = streams.stream().map(e -> e.getName()).collect(Collectors.toList());
 
-            links.add(new PullRequestData(patch.getId(), streamsStr, patch.getURL()));
+            boolean isNoUpstreamRequired = false;
+            isNoUpstreamRequired = isNoUpstreamRequired(patch);
+            Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
+            try {
+                commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(patch));
+            } catch (NotFoundException e) {
+                logger.log(Level.FINE, "Unable to find build result for pull request : " + patch.getURL(), e);
+            }
+
+            links.add(new PullRequestData(patch.getId(), streamsStr, patch.getURL(), patch.getCodebase().getName(),
+                    patch.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
 
         data.put("pullRequestsRelated", links);
+    }
 
+    private boolean isNoUpstreamRequired(Patch p) {
+        Optional<String> pullRequestBoday = Optional.ofNullable(p.getBody());
+        Matcher matcher = Constants.UPSTREAM_NOT_REQUIRED.matcher(pullRequestBoday.orElse("N/A"));
+        if (matcher.find())
+            return true;
+        else
+            return false;
     }
 
 }

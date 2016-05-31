@@ -24,7 +24,6 @@ package org.jboss.set.assistant.processor;
 
 import java.util.List;
 
-import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.data.ProcessorData;
@@ -33,9 +32,7 @@ import org.jboss.set.assistant.data.ProcessorData;
  * @author wangc
  *
  */
-public interface PayloadProcessor {
-
-    void init(Aphrodite aphrodite);
+public interface PayloadProcessor extends Processor {
 
     // EAP 6 + Bugzilla
     List<ProcessorData> process(Issue issue, Stream stream) throws ProcessorException;

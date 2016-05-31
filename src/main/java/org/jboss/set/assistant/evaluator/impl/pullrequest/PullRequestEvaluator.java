@@ -23,9 +23,17 @@
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
+import org.jboss.set.aphrodite.Aphrodite;
+import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Patch;
-import org.jboss.set.assistant.data.LinkData;
+import org.jboss.set.aphrodite.spi.NotFoundException;
+import org.jboss.set.assistant.Constants;
+import org.jboss.set.assistant.data.payload.AssociatedPullRequest;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
 
@@ -35,6 +43,8 @@ import org.jboss.set.assistant.evaluator.EvaluatorContext;
  */
 public class PullRequestEvaluator implements Evaluator {
 
+    private static final Logger logger = Logger.getLogger(PullRequestEvaluator.class.getCanonicalName());
+
     @Override
     public String name() {
         return "Pull Request Evaluator";
@@ -43,8 +53,27 @@ public class PullRequestEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
         Patch patch = context.getPatch();
-        data.put("pullRequest", new LinkData(patch.getId(), patch.getURL()));
+        boolean isNoUpstreamRequired = false;
+        isNoUpstreamRequired = isNoUpstreamRequired(patch);
+        Aphrodite aphrodite = context.getAphrodite();
+        Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
+        try {
+            commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(patch));
+        } catch (NotFoundException e) {
+            logger.log(Level.FINE, "Unable to find build result for pull request : " + patch.getURL(), e);
+        }
+        data.put("pullRequest", new AssociatedPullRequest(patch.getId(), patch.getURL(), patch.getCodebase().getName(),
+                patch.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
 
+    }
+
+    private boolean isNoUpstreamRequired(Patch p) {
+        Optional<String> pullRequestBoday = Optional.ofNullable(p.getBody());
+        Matcher matcher = Constants.UPSTREAM_NOT_REQUIRED.matcher(pullRequestBoday.orElse("N/A"));
+        if (matcher.find())
+            return true;
+        else
+            return false;
     }
 
 }

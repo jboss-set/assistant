@@ -24,6 +24,10 @@ package org.jboss.set.assistant.data;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
+
+import org.jboss.set.aphrodite.domain.IssueStatus;
+import org.jboss.set.aphrodite.domain.IssueType;
 
 /**
  * @author egonzalez
@@ -31,15 +35,20 @@ import java.util.List;
  */
 public class IssueData {
     private URL link;
-
     private String label;
-
     private List<String> streams;
+    private IssueStatus status;
+    private IssueType type;
+    private Map<String, String> flags;
 
-    public IssueData(String label, List<String> streams, URL link) {
+    public IssueData(String label, List<String> streams, URL link, IssueStatus status, IssueType type,
+            Map<String, String> flags) {
         this.link = link;
         this.label = label;
         this.streams = streams;
+        this.status = status;
+        this.type = type;
+        this.flags = flags;
     }
 
     public String getLabel() {
@@ -53,4 +62,17 @@ public class IssueData {
     public URL getLink() {
         return link;
     }
+
+    public IssueStatus getStatus() {
+        return status;
+    }
+
+    public IssueType getType() {
+        return type;
+    }
+
+    public Map<String, String> getFlags() {
+        return flags;
+    }
+
 }
