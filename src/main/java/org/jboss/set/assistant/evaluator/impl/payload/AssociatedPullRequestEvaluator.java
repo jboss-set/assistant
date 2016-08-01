@@ -25,9 +25,11 @@ package org.jboss.set.assistant.evaluator.impl.payload;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -72,8 +74,8 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         TrackerType trackerType = context.getTrackerType();
         Stream stream = context.getStream();
 
-        List<Patch> relatedPullRequests = new ArrayList<>();
-        List<Patch> unrelatedPullRequests = new ArrayList<>();
+        Set <Patch> relatedPullRequests = new HashSet<>();
+        Set<Patch> unrelatedPullRequests = new HashSet<>();
 
         if (trackerType.equals(TrackerType.BUGZILLA)) {
             // scan comments to get relevant pull request;
@@ -123,7 +125,7 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         data.put(KEY_UNRELATED, unrelatedDataList);
     }
 
-    private void extractPullRequest(Aphrodite aphrodite, Stream stream, List<Patch> relatedPullRequestsURL, List<Patch> unrelatedPullRequestsURL, String url) {
+    private void extractPullRequest(Aphrodite aphrodite, Stream stream, Set<Patch> relatedPullRequestsURL, Set<Patch> unrelatedPullRequestsURL, String url) {
         Matcher matcher = Constants.RELATED_PR_PATTERN.matcher(url);
         while (matcher.find()) {
             if (matcher.groupCount() == 3) {
