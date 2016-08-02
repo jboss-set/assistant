@@ -25,6 +25,7 @@ package org.jboss.set.assistant.data.payload;
 import java.net.URL;
 import java.util.Map;
 
+import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
 
@@ -35,13 +36,20 @@ import org.jboss.set.aphrodite.domain.IssueType;
 public class DependsOnIssue extends PayloadIssue {
 
     private boolean inPayload;
+    private Map<String, FlagStatus> streamStatus;
 
-    public DependsOnIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags, boolean inPayload) {
+    public DependsOnIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags, boolean inPayload, Map<String, FlagStatus> streamStatus) {
         super(link, label, status, type, flags);
         this.inPayload = inPayload;
+        this.streamStatus = streamStatus;
     }
 
     public boolean isInPayload() {
         return inPayload;
     }
+
+    public Map<String, FlagStatus> getStreamStatus() {
+        return streamStatus;
+    }
+
 }
