@@ -22,24 +22,10 @@
 
 package org.jboss.set.assistant;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.jboss.set.aphrodite.Aphrodite;
-import org.jboss.set.aphrodite.domain.Issue;
-import org.jboss.set.aphrodite.domain.Label;
-import org.jboss.set.aphrodite.domain.Patch;
-import org.jboss.set.aphrodite.domain.PatchState;
-import org.jboss.set.aphrodite.domain.Repository;
-import org.jboss.set.aphrodite.domain.Stream;
-import org.jboss.set.aphrodite.domain.StreamComponent;
 import org.jboss.set.aphrodite.spi.AphroditeException;
-import org.jboss.set.aphrodite.spi.NotFoundException;
 
 /**
  * @author wangc
@@ -51,8 +37,6 @@ public class AssistantClient {
 
     private static Aphrodite aphrodite;
 
-    private Properties properties; // FIXME
-
     private AssistantClient() {
         logger.info("starting AssistantClient.");
     }
@@ -62,37 +46,5 @@ public class AssistantClient {
             aphrodite = Aphrodite.instance();
         }
         return aphrodite;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    // several common functions already provided by Aphrodite
-
-    public List<Label> getGithubLabels(Patch patch) throws NotFoundException {
-        return aphrodite.getLabelsFromPatch(patch);
-    }
-
-    public List<Patch> getPatchesByState(Repository repository, PatchState state) throws NotFoundException {
-        return aphrodite.getPatchesByState(repository, state);
-    }
-
-    public Map<StreamComponent, List<Patch>> getPatchesByState(String streamName, PatchState state) throws NotFoundException {
-        Map<StreamComponent, List<Patch>> patches = new HashMap<>();
-        Stream stream = aphrodite.getStream(streamName);
-        Collection<StreamComponent> components = stream.getAllComponents();
-        for (StreamComponent component : components)
-            patches.put(component, aphrodite.getPatchesByState(component.getRepository(), state));
-        return patches;
-    }
-
-    public List<Patch> getPatchesByState(URL url, PatchState state) throws NotFoundException {
-        Repository repository = aphrodite.getRepository(url);
-        return aphrodite.getPatchesByState(repository, state);
-    }
-
-    public List<Issue> getIssuesAssociatedWith(Patch patch) {
-        return aphrodite.getIssuesAssociatedWith(patch);
     }
 }
