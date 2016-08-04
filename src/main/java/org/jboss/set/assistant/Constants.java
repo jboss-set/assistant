@@ -36,6 +36,11 @@ public class Constants {
     public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
     public static final String BROWSE_ISSUE_PATH = "/browse/";
 
-    public static final String EAP7_STREAM_TARGET_RELEASE = "7.0.z.GA";
+    public static final String EAP7_STREAM_TARGET_RELEASE_70ZGA = "7.0.z.GA";
+    public static final String EAP7_STREAM_TARGET_RELEASE_7BACKLOGGA = "7.backlog.GA";
+    public static final String EAP7_STREAM_TARGET_RELEASE_710GA = "7.1.0.GA";
+
+    public static final String EAP70ZSTREAM = "jboss-eap-7.0.z";
+    public static final String EAP7Z0STREAM = "jboss-eap-7.z.0";
 
 }

@@ -74,7 +74,7 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         TrackerType trackerType = context.getTrackerType();
         Stream stream = context.getStream();
 
-        Set <Patch> relatedPullRequests = new HashSet<>();
+        Set<Patch> relatedPullRequests = new HashSet<>();
         Set<Patch> unrelatedPullRequests = new HashSet<>();
 
         if (trackerType.equals(TrackerType.BUGZILLA)) {

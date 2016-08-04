@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
 
@@ -40,15 +41,17 @@ public class IssueData {
     private IssueStatus status;
     private IssueType type;
     private Map<String, String> flags;
+    private Map<String, FlagStatus> streamStatus;
 
     public IssueData(String label, List<String> streams, URL link, IssueStatus status, IssueType type,
-            Map<String, String> flags) {
+            Map<String, String> flags, Map<String, FlagStatus> streamStatus) {
         this.link = link;
         this.label = label;
         this.streams = streams;
         this.status = status;
         this.type = type;
         this.flags = flags;
+        this.streamStatus = streamStatus;
     }
 
     public String getLabel() {
@@ -75,4 +78,7 @@ public class IssueData {
         return flags;
     }
 
+    public Map<String, FlagStatus> getStreamStatus() {
+        return streamStatus;
+    }
 }

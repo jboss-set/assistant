@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -56,7 +57,7 @@ public class PullRequestRelatedEvaluator implements Evaluator {
 
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
-        List<Patch> relatedPatches = context.getRelated();
+        Set<Patch> relatedPatches = context.getRelated();
         Aphrodite aphrodite = context.getAphrodite();
 
         List<PullRequestData> links = new ArrayList<>();

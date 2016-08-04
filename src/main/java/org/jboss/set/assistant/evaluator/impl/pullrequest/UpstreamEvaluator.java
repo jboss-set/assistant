@@ -22,8 +22,8 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jboss.set.aphrodite.domain.Patch;
@@ -46,7 +46,7 @@ public class UpstreamEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
         Patch patch = context.getPatch();
-        List<Patch> related = context.getRelated();
+        Set<Patch> related = context.getRelated();
 
         if (!UPSTREAM_NOT_REQUIRED.matcher(patch.getBody()).find()) {
             if (!related.isEmpty()) {

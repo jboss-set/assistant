@@ -22,7 +22,7 @@
 
 package org.jboss.set.assistant.evaluator;
 
-import java.util.List;
+import java.util.Set;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
@@ -39,16 +39,16 @@ public class EvaluatorContext {
 
     private Patch patch;
 
-    private List<Issue> issues;
+    private Set<Issue> issues;
 
-    private List<Patch> related;
+    private Set<Patch> related;
 
     private Repository repository;
 
     private Stream stream;
 
     public EvaluatorContext(Aphrodite aphrodite, Repository repository, Patch patch,
-            List<Issue> issues, List<Patch> related, Stream stream) {
+            Set<Issue> issues, Set<Patch> related, Stream stream) {
         this.aphrodite = aphrodite;
         this.patch = patch;
         this.issues = issues;
@@ -69,11 +69,11 @@ public class EvaluatorContext {
         return patch.getCodebase().getName();
     }
 
-    public List<Issue> getIssues() {
+    public Set<Issue> getIssues() {
         return issues;
     }
 
-    public List<Patch> getRelated() {
+    public Set<Patch> getRelated() {
         return related;
     }
 

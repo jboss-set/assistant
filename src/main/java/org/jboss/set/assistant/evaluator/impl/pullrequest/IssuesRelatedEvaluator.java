@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jboss.set.aphrodite.Aphrodite;
@@ -52,7 +53,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
 
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
-        List<Issue> issues = context.getIssues();
+        Set<Issue> issues = context.getIssues();
         Map<String, List<String>> issueStream = new HashMap<>();
 
         for (Issue issue : issues) {
@@ -75,7 +76,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
                     })
                     .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue())))))
+                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))),e.getStreamStatus()))
                     .collect(Collectors.toList()));
 
             data.put("issuesOtherStreams", issues.stream()
@@ -86,33 +87,47 @@ public class IssuesRelatedEvaluator implements Evaluator {
                     })
                     .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue())))))
+                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));
         } else if (currentStream.getName().contains("eap-7")) {
             data.put("issuesRelated", issues.stream()
-                    .filter(e -> e.getStreamStatus().keySet().stream()
-                            .filter(e1 -> e1.equals(Constants.EAP7_STREAM_TARGET_RELEASE)).findAny().isPresent())
+                    .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> checkStream(currentStream, e1)).findAny()
+                            .isPresent())
                     .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
-                            e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue())))))
+                            e.getStatus(), e.getType(),
+                            e.getStage().getStateMap().entrySet().stream().collect(
+                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));
 
             data.put("issuesOtherStreams", issues.stream()
-                    .filter(e -> e.getStreamStatus().keySet().stream()
-                            .filter(e1 -> !e1.equals(Constants.EAP7_STREAM_TARGET_RELEASE)).findAny().isPresent())
+                    .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> !checkStream(currentStream, e1)).findAny()
+                            .isPresent())
                     .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
-                            e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue())))))
+                            e.getStatus(), e.getType(),
+                            e.getStage().getStateMap().entrySet().stream().collect(
+                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));
         } else {
             // wildfly stream
             data.put("issuesRelated", issues.stream()
                     .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue())))))
+                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));
 
             data.put("issuesOtherStreams", Collections.emptyList());
+        }
+    }
+
+    // workaround! it depends on streams.json and target release in jira, can be changed easily before process is steady.
+    private boolean checkStream(Stream currentStream, String targetRelease) {
+        String currentStreamName = currentStream.getName();
+        if (currentStreamName.equals(Constants.EAP70ZSTREAM)) {
+            return targetRelease.equals(Constants.EAP7_STREAM_TARGET_RELEASE_70ZGA) || targetRelease.equals(Constants.EAP7_STREAM_TARGET_RELEASE_7BACKLOGGA);
+        } else if (currentStreamName.equals(Constants.EAP7Z0STREAM)) {
+            return targetRelease.equals(Constants.EAP7_STREAM_TARGET_RELEASE_710GA);
+        } else {
+            return false;
         }
     }
 }

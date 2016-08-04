@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,7 +56,7 @@ public class LabelsEvaluator implements Evaluator {
     public void eval(EvaluatorContext context, Map<String, Object> data) {
 
         Patch patch = context.getPatch();
-        List<Issue> issues = context.getIssues();
+        Set<Issue> issues = context.getIssues();
 
         // if there aren't any bug related then we show a message
         if (issues.isEmpty()) {
