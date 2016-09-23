@@ -38,6 +38,7 @@ import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
 import org.jboss.set.aphrodite.domain.Release;
+import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.DependsOnIssue;
@@ -64,6 +65,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
         Aphrodite aphrodite = context.getAphrodite();
 
         Issue dependencyIssue = context.getIssue();
+        Stream stream = context.getStream();
         List<URL> dependsOnURL = dependencyIssue.getDependsOn();
 
         List<DependsOnIssue> dependsOnIssues = new ArrayList<>();
@@ -75,13 +77,13 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                     Issue issue = aphrodite.getIssue(url);
                     boolean inPayload = issue.getBlocks().stream()
                             .anyMatch(e -> extractId(e).equalsIgnoreCase(payloadTracker.getTrackerId().get()))
-                            || checkIsReleased(issue) || checkIssueType(issue);
-                    dependsOnIssues
-                            .add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getStatus(),
-                                    issue.getType(), issue.getStage().getStateMap().entrySet().stream()
-                                            .collect(Collectors.toMap(e -> String.valueOf(e.getKey()),
-                                                    e -> String.valueOf(e.getValue()))),
-                                    inPayload, issue.getStreamStatus()));
+                            || checkIsReleased(issue) || checkIssueType(issue) || !matchStream(issue, stream);
+
+                    dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"),
+                            issue.getStatus(), issue.getType(),
+                            issue.getStage().getStateMap().entrySet().stream().collect(
+                                    Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                            inPayload, issue.getStreamStatus()));
                 } catch (NotFoundException e) {
                     logger.log(Level.FINE, "Unable to find depends on issue with " + url, e);
                 }
@@ -91,9 +93,11 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                 try {
                     Issue issue = aphrodite.getIssue(url);
                     String fixVersion = context.getFixVersion();
-                    boolean inPayload = checkFixVersion(issue, fixVersion) || checkIsReleased(issue) || checkIssueType(issue);
+                    boolean inPayload = checkFixVersion(issue, fixVersion) || checkIsReleased(issue) || checkIssueType(issue)
+                            || !matchStream(issue, stream);
                     dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"),
-                            issue.getStatus(), issue.getType(), issue.getStage().getStateMap().entrySet().stream().collect(
+                            issue.getStatus(), issue.getType(),
+                            issue.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
                             inPayload, issue.getStreamStatus()));
                 } catch (NotFoundException e) {
@@ -118,6 +122,11 @@ public class DependsOnEvaluator implements PayloadEvaluator {
     // one-off does not need to be included in payload
     private boolean checkIssueType(Issue issue) {
         return issue.getType().equals(IssueType.ONE_OFF);
+    }
+
+    // check whether depend on issue with same stream is missed in payload
+    private boolean matchStream(Issue issue, Stream stream) {
+        return issue.getStreamStatus().keySet().stream().anyMatch(e -> e.equals(stream.getName()));
     }
 
     private boolean checkFixVersion(Issue issue, String fixVersion) {
