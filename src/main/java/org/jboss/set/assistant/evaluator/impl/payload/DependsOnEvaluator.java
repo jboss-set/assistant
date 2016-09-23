@@ -83,7 +83,9 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                             issue.getStatus(), issue.getType(),
                             issue.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                            inPayload, issue.getStreamStatus()));
+                            inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
+                                    .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                            issue.getStreamStatus()));
                 } catch (NotFoundException e) {
                     logger.log(Level.FINE, "Unable to find depends on issue with " + url, e);
                 }
@@ -99,7 +101,9 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                             issue.getStatus(), issue.getType(),
                             issue.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                            inPayload, issue.getStreamStatus()));
+                            inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
+                                    .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                            issue.getStreamStatus()));
                 } catch (NotFoundException e) {
                     logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
                 }
