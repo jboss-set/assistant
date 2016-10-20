@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jboss-set/assistant.svg?branch=master)](https://travis-ci.org/jboss-set/assistant)
+
 # assistant
 A shared component based on Aphrodite where we define pull request logic and CDW workflow rule.
 
