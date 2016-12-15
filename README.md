@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/jboss-set/assistant.svg?branch=master)](https://travis-ci.org/jboss-set/assistant)
 
+# THIS REPO IS DEPRECATED
+## Code has been moved to https://github.com/jboss-set/prbz-overview
 # assistant
 A shared component based on Aphrodite where we define pull request logic and CDW workflow rule.
 
