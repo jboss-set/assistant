@@ -22,16 +22,6 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.Patch;
@@ -41,6 +31,16 @@ import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.PullRequestData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * @author egonzalez
@@ -62,7 +62,7 @@ public class PullRequestRelatedEvaluator implements Evaluator {
 
         List<PullRequestData> links = new ArrayList<>();
         for (Patch patch : relatedPatches) {
-            List<Stream> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
+            List<Stream> streams = aphrodite.getStreamsBy(patch.getRepository().getURL(), patch.getCodebase());
             List<String> streamsStr = streams.stream().map(e -> e.getName()).collect(Collectors.toList());
 
             boolean isNoUpstreamRequired = false;

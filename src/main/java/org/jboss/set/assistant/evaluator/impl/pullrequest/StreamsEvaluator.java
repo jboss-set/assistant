@@ -22,15 +22,15 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author egonzalez
@@ -49,7 +49,7 @@ public class StreamsEvaluator implements Evaluator {
         Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
 
-        List<Stream> stream = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
+        List<Stream> stream = aphrodite.getStreamsBy(patch.getRepository().getURL(), patch.getCodebase());
         List<String> streamsStr = stream.stream().map(e -> e.getName()).collect(Collectors.toList());
         data.put("streams", streamsStr);
 
