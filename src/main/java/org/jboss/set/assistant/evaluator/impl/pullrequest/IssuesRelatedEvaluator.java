@@ -22,14 +22,6 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
@@ -39,6 +31,14 @@ import org.jboss.set.assistant.data.IssueData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
 import org.jboss.set.assistant.evaluator.Util;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author egonzalez
@@ -64,7 +64,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
         Stream currentStream = context.getStream();
         Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
-        List<String> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
+        List<String> streams = aphrodite.getStreamsBy(patch.getRepository().getURL(), patch.getCodebase()).stream().map(e -> e.getName())
                 .collect(Collectors.toList());
 
         if (currentStream.getName().contains("eap-6")) {
