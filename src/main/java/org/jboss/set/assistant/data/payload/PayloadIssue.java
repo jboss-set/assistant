@@ -34,18 +34,16 @@ import org.jboss.set.aphrodite.domain.IssueType;
  */
 public class PayloadIssue {
     private URL link;
-
     private String label;
-
+    private String summary;
     private IssueStatus status;
-
     private IssueType type;
-
     private Map<String, String> flags;
 
-    public PayloadIssue(URL link, String label, IssueStatus status, IssueType type, Map<String, String> flags) {
+    public PayloadIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags) {
         this.link = link;
         this.label = label;
+        this.summary = summary;
         this.status = status;
         this.type = type;
         this.flags = flags;
@@ -57,6 +55,10 @@ public class PayloadIssue {
 
     public String getLabel() {
         return label;
+    }
+
+    public String getSummary() {
+        return summary;
     }
 
     public IssueStatus getStatus() {

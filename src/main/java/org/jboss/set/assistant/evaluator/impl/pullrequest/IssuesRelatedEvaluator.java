@@ -74,7 +74,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
                         intersect.retainAll(issueStream.get(e.getTrackerId().get()));
                         return !intersect.isEmpty();
                     })
-                    .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
+                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))),e.getStreamStatus()))
                     .collect(Collectors.toList()));
@@ -85,7 +85,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
                         intersect.retainAll(issueStream.get(e.getTrackerId().get()));
                         return intersect.isEmpty();
                     })
-                    .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
+                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));
@@ -93,7 +93,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
             data.put("issuesRelated", issues.stream()
                     .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> checkStream(currentStream, e1)).findAny()
                             .isPresent())
-                    .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
+                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
                             e.getStatus(), e.getType(),
                             e.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
@@ -102,7 +102,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
             data.put("issuesOtherStreams", issues.stream()
                     .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> !checkStream(currentStream, e1)).findAny()
                             .isPresent())
-                    .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
+                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
                             e.getStatus(), e.getType(),
                             e.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
@@ -110,7 +110,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
         } else {
             // wildfly stream
             data.put("issuesRelated", issues.stream()
-                    .map(e -> new IssueData(e.getTrackerId().get(), issueStream.get(e.getTrackerId().get()), e.getURL(),
+                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
                             e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
                                     Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
                     .collect(Collectors.toList()));

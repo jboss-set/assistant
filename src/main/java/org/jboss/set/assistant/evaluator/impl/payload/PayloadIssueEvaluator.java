@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.jboss.set.aphrodite.domain.Issue;
+import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.PayloadIssue;
 import org.jboss.set.assistant.evaluator.PayloadEvaluator;
 import org.jboss.set.assistant.evaluator.PayloadEvaluatorContext;
@@ -48,7 +49,7 @@ public class PayloadIssueEvaluator implements PayloadEvaluator {
 
         Issue dependencyIssue = context.getIssue();
 
-        data.put(KEY, new PayloadIssue(dependencyIssue.getURL(), dependencyIssue.getTrackerId().orElse("N/A"),
+        data.put(KEY, new PayloadIssue(dependencyIssue.getURL(), dependencyIssue.getTrackerId().orElse(Constants.NOTAPPLICABLE), dependencyIssue.getSummary().orElse(Constants.NOTAPPLICABLE),
                 dependencyIssue.getStatus(), dependencyIssue.getType(),
                 dependencyIssue.getStage().getStateMap().entrySet().stream()
                         .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())))));

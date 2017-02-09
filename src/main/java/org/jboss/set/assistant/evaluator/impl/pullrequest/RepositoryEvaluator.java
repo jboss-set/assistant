@@ -32,6 +32,7 @@ import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Repository;
 import org.jboss.set.aphrodite.domain.StreamComponent;
 import org.jboss.set.aphrodite.spi.NotFoundException;
+import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.LinkData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -55,7 +56,7 @@ public class RepositoryEvaluator implements Evaluator {
         Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
         StreamComponent streamComponent;
-        Optional<String> componentName = Optional.of("N/A");
+        Optional<String> componentName = Optional.of(Constants.NOTAPPLICABLE);
         try {
             streamComponent = aphrodite.getComponentBy(patch.getRepository(), patch.getCodebase());
             componentName = Optional.of(streamComponent.getName());

@@ -37,16 +37,18 @@ import org.jboss.set.aphrodite.domain.IssueType;
 public class IssueData {
     private URL link;
     private String label;
+    private String summary;
     private List<String> streams;
     private IssueStatus status;
     private IssueType type;
     private Map<String, String> flags;
     private Map<String, FlagStatus> streamStatus;
 
-    public IssueData(String label, List<String> streams, URL link, IssueStatus status, IssueType type,
+    public IssueData(URL link, String label, String summary, List<String> streams, IssueStatus status, IssueType type,
             Map<String, String> flags, Map<String, FlagStatus> streamStatus) {
         this.link = link;
         this.label = label;
+        this.summary = summary;
         this.streams = streams;
         this.status = status;
         this.type = type;
@@ -56,6 +58,10 @@ public class IssueData {
 
     public String getLabel() {
         return label;
+    }
+
+    public String getSummary() {
+        return summary;
     }
 
     public List<String> getStreams() {

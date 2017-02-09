@@ -43,4 +43,6 @@ public class Constants {
     public static final String EAP70ZSTREAM = "jboss-eap-7.0.z";
     public static final String EAP7Z0STREAM = "jboss-eap-7.z.0";
 
+    public static final String NOTAPPLICABLE = "N/A";
+
 }
