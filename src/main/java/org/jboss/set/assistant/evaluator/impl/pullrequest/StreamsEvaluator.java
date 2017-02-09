@@ -22,15 +22,17 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
+import org.jboss.set.assistant.evaluator.Util;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author egonzalez
@@ -45,14 +47,14 @@ public class StreamsEvaluator implements Evaluator {
 
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
-
         Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
 
-        List<Stream> stream = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase());
-        List<String> streamsStr = stream.stream().map(e -> e.getName()).collect(Collectors.toList());
-        data.put("streams", streamsStr);
-
+        URI uri = Util.convertURLtoURI(patch.getRepository().getURL());
+        if (uri != null) {
+            List<Stream> stream = aphrodite.getStreamsBy(uri, patch.getCodebase());
+            List<String> streamsStr = stream.stream().map(e -> e.getName()).collect(Collectors.toList());
+            data.put("streams", streamsStr);
+        }
     }
-
 }

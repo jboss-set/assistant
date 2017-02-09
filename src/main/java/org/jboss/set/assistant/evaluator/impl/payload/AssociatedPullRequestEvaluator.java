@@ -22,18 +22,6 @@
 
 package org.jboss.set.assistant.evaluator.impl.payload;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Codebase;
@@ -49,6 +37,18 @@ import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.AssociatedPullRequest;
 import org.jboss.set.assistant.evaluator.PayloadEvaluator;
 import org.jboss.set.assistant.evaluator.PayloadEvaluatorContext;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 /**
  * @author wangc
@@ -156,7 +156,7 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
         Codebase codebase = patch.getCodebase();
         Repository repository = patch.getRepository();
         return stream.getAllComponents().stream()
-                .anyMatch(e -> e.getCodebase().equals(codebase) && e.getRepository().equals(repository));
+                .anyMatch(e -> e.getCodebase().equals(codebase) && e.getRepositoryURL().equals(repository.getURL()));
     }
 
     private boolean isNoUpstreamRequired(Patch p) {

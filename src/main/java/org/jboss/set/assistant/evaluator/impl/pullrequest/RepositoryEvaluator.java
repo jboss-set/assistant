@@ -22,11 +22,6 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Patch;
 import org.jboss.set.aphrodite.domain.Repository;
@@ -36,6 +31,13 @@ import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.LinkData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
+import org.jboss.set.assistant.evaluator.Util;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author egonzalez
@@ -57,12 +59,15 @@ public class RepositoryEvaluator implements Evaluator {
         Patch patch = context.getPatch();
         StreamComponent streamComponent;
         Optional<String> componentName = Optional.of(Constants.NOTAPPLICABLE);
-        try {
-            streamComponent = aphrodite.getComponentBy(patch.getRepository(), patch.getCodebase());
-            componentName = Optional.of(streamComponent.getName());
-        } catch (NotFoundException e) {
-            logger.log(Level.WARNING, e.getMessage(), e);
+        URI uri = Util.convertURLtoURI(patch.getRepository().getURL());
+        if (uri != null) {
+            try {
+                streamComponent = aphrodite.getComponentBy(uri, patch.getCodebase());
+                componentName = Optional.of(streamComponent.getName());
+            } catch (NotFoundException e) {
+                logger.log(Level.WARNING, e.getMessage(), e);
+            }
+            data.put("repository", new LinkData(componentName.get(), repository.getURL()));
         }
-        data.put("repository", new LinkData(componentName.get(), repository.getURL()));
     }
 }

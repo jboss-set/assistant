@@ -22,14 +22,6 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.Patch;
@@ -39,6 +31,15 @@ import org.jboss.set.assistant.data.IssueData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
 import org.jboss.set.assistant.evaluator.Util;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author egonzalez
@@ -64,58 +65,75 @@ public class IssuesRelatedEvaluator implements Evaluator {
         Stream currentStream = context.getStream();
         Aphrodite aphrodite = context.getAphrodite();
         Patch patch = context.getPatch();
-        List<String> streams = aphrodite.getStreamsBy(patch.getRepository(), patch.getCodebase()).stream().map(e -> e.getName())
-                .collect(Collectors.toList());
 
-        if (currentStream.getName().contains("eap-6")) {
-            data.put("issuesRelated", issues.stream()
-                    .filter(e -> {
-                        List<String> intersect = new ArrayList<>(streams);
-                        intersect.retainAll(issueStream.get(e.getTrackerId().get()));
-                        return !intersect.isEmpty();
-                    })
-                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
-                            e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))),e.getStreamStatus()))
-                    .collect(Collectors.toList()));
+        URI uri = Util.convertURLtoURI(patch.getRepository().getURL());
+        if (uri != null) {
+            List<String> streams = aphrodite.getStreamsBy(uri, patch.getCodebase()).stream().map(e -> e.getName())
+                    .collect(Collectors.toList());
 
-            data.put("issuesOtherStreams", issues.stream()
-                    .filter(e -> {
-                        List<String> intersect = new ArrayList<>(streams);
-                        intersect.retainAll(issueStream.get(e.getTrackerId().get()));
-                        return intersect.isEmpty();
-                    })
-                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
-                            e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
-                    .collect(Collectors.toList()));
-        } else if (currentStream.getName().contains("eap-7")) {
-            data.put("issuesRelated", issues.stream()
-                    .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> checkStream(currentStream, e1)).findAny()
-                            .isPresent())
-                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
-                            e.getStatus(), e.getType(),
-                            e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
-                    .collect(Collectors.toList()));
+            if (currentStream.getName().contains("eap-6")) {
+                data.put("issuesRelated", issues.stream().filter(e -> {
+                    List<String> intersect = new ArrayList<>(streams);
+                    intersect.retainAll(issueStream.get(e.getTrackerId().get()));
+                    return !intersect.isEmpty();
+                }).map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE),
+                        issueStream.get(e.getTrackerId().get()), e.getStatus(), e.getType(),
+                        e.getStage().getStateMap().entrySet().stream()
+                                .collect(Collectors.toMap(e1 -> String.valueOf(e1.getKey()),
+                                        e1 -> String.valueOf(e1.getValue()))),
+                        e.getStreamStatus())).collect(Collectors.toList()));
 
-            data.put("issuesOtherStreams", issues.stream()
-                    .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> !checkStream(currentStream, e1)).findAny()
-                            .isPresent())
-                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
-                            e.getStatus(), e.getType(),
-                            e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
-                    .collect(Collectors.toList()));
-        } else {
-            // wildfly stream
-            data.put("issuesRelated", issues.stream()
-                    .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
-                            e.getStatus(), e.getType(), e.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e1 -> String.valueOf(e1.getKey()), e1 -> String.valueOf(e1.getValue()))), e.getStreamStatus()))
-                    .collect(Collectors.toList()));
+                data.put("issuesOtherStreams", issues.stream().filter(e -> {
+                    List<String> intersect = new ArrayList<>(streams);
+                    intersect.retainAll(issueStream.get(e.getTrackerId().get()));
+                    return intersect.isEmpty();
+                }).map(e -> new IssueData(e.getURL(), e.getTrackerId().get(), e.getSummary().orElse(Constants.NOTAPPLICABLE),
+                        issueStream.get(e.getTrackerId().get()), e.getStatus(), e.getType(),
+                        e.getStage().getStateMap().entrySet().stream()
+                                .collect(Collectors.toMap(e1 -> String.valueOf(e1.getKey()),
+                                        e1 -> String.valueOf(e1.getValue()))),
+                        e.getStreamStatus())).collect(Collectors.toList()));
+            } else if (currentStream.getName().contains("eap-7")) {
+                data.put("issuesRelated",
+                        issues.stream()
+                                .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> checkStream(currentStream, e1))
+                                        .findAny().isPresent())
+                                .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(),
+                                        e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
+                                        e.getStatus(), e.getType(),
+                                        e.getStage().getStateMap().entrySet().stream()
+                                                .collect(Collectors.toMap(e1 -> String.valueOf(e1.getKey()),
+                                                        e1 -> String.valueOf(e1.getValue()))),
+                                        e.getStreamStatus()))
+                                .collect(Collectors.toList()));
 
-            data.put("issuesOtherStreams", Collections.emptyList());
+                data.put("issuesOtherStreams",
+                        issues.stream()
+                                .filter(e -> e.getStreamStatus().keySet().stream().filter(e1 -> !checkStream(currentStream, e1))
+                                        .findAny().isPresent())
+                                .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(),
+                                        e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
+                                        e.getStatus(), e.getType(),
+                                        e.getStage().getStateMap().entrySet().stream()
+                                                .collect(Collectors.toMap(e1 -> String.valueOf(e1.getKey()),
+                                                        e1 -> String.valueOf(e1.getValue()))),
+                                        e.getStreamStatus()))
+                                .collect(Collectors.toList()));
+            } else {
+                // wildfly stream
+                data.put("issuesRelated",
+                        issues.stream()
+                                .map(e -> new IssueData(e.getURL(), e.getTrackerId().get(),
+                                        e.getSummary().orElse(Constants.NOTAPPLICABLE), issueStream.get(e.getTrackerId().get()),
+                                        e.getStatus(), e.getType(),
+                                        e.getStage().getStateMap().entrySet().stream()
+                                                .collect(Collectors.toMap(e1 -> String.valueOf(e1.getKey()),
+                                                        e1 -> String.valueOf(e1.getValue()))),
+                                        e.getStreamStatus()))
+                                .collect(Collectors.toList()));
+
+                data.put("issuesOtherStreams", Collections.emptyList());
+            }
         }
     }
 
