@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -33,11 +36,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Jason T. Greene
  */
 public class Util {
+
+    private static Logger logger = Logger.getLogger(Util.class.getCanonicalName());
 
     public static void safeClose(Closeable closeable) {
         if (closeable != null)
@@ -122,5 +129,14 @@ public class Util {
             if (e instanceof RuntimeException) throw (RuntimeException) e;
             throw new RuntimeException(e);
         }
+    }
+
+    public static URI convertURLtoURI(URL url) {
+        try {
+            return url.toURI();
+        } catch (URISyntaxException e) {
+            logger.log(Level.WARNING, "Error to convert URI from url : " + url, e);
+        }
+        return null;
     }
 }

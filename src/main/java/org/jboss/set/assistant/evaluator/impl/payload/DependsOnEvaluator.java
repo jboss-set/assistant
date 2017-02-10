@@ -24,6 +24,7 @@ package org.jboss.set.assistant.evaluator.impl.payload;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,8 +32,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.naming.NameNotFoundException;
 
-import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.common.Utils;
 import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
@@ -63,53 +64,42 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
-        Aphrodite aphrodite = context.getAphrodite();
-
         Issue dependencyIssue = context.getIssue();
         Stream stream = context.getStream();
-        List<URL> dependsOnURL = dependencyIssue.getDependsOn();
+        java.util.stream.Stream<Issue> upstreamReferences = java.util.stream.Stream.empty();
+        try {
+            upstreamReferences = dependencyIssue.getUpstreamReferences();
+        } catch (NameNotFoundException e) {
+            logger.log(Level.SEVERE, "Unable to load service due to " + e.getMessage(), e);
+        }
 
         List<DependsOnIssue> dependsOnIssues = new ArrayList<>();
 
+        // FIXME empty violations collection
         if (context.getTrackerType().equals(TrackerType.BUGZILLA)) {
             Issue payloadTracker = context.getPayloadTracker();
-            for (URL url : dependsOnURL) {
-                try {
-                    Issue issue = aphrodite.getIssue(url);
-                    boolean inPayload = issue.getBlocks().stream()
-                            .anyMatch(e -> extractId(e).equalsIgnoreCase(payloadTracker.getTrackerId().get()))
-                            || checkIsReleased(issue) || checkIssueType(issue) || !matchStream(issue, stream);
-
-                    dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getSummary().orElse(Constants.NOTAPPLICABLE),
-                            issue.getStatus(), issue.getType(),
-                            issue.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                            inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
-                                    .map(e -> e.getVersion().get()).collect(Collectors.toList()),
-                            issue.getStreamStatus()));
-                } catch (NotFoundException e) {
-                    logger.log(Level.FINE, "Unable to find depends on issue with " + url, e);
-                }
-            }
+            upstreamReferences.forEach(issue -> {
+                boolean inPayload = issue.getBlocks().stream().anyMatch(e -> extractId(e).equalsIgnoreCase(payloadTracker.getTrackerId().get())) || checkIsReleased(issue) || checkIssueType(issue) || !matchStream(issue, stream);
+                dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"),
+                        issue.getSummary().orElse(Constants.NOTAPPLICABLE), issue.getStatus(), issue.getType(),
+                        issue.getStage().getStateMap().entrySet().stream()
+                                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                        Collections.emptyList(), inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
+                                .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                        issue.getStreamStatus()));
+            });
         } else {
-            for (URL url : dependsOnURL) {
-                try {
-                    Issue issue = aphrodite.getIssue(url);
-                    String fixVersion = context.getFixVersion();
-                    boolean inPayload = checkFixVersion(issue, fixVersion) || checkIsReleased(issue) || checkIssueType(issue)
-                            || !matchStream(issue, stream);
-                    dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"), issue.getSummary().orElse(Constants.NOTAPPLICABLE),
-                            issue.getStatus(), issue.getType(),
-                            issue.getStage().getStateMap().entrySet().stream().collect(
-                                    Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                            inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
-                                    .map(e -> e.getVersion().get()).collect(Collectors.toList()),
-                            issue.getStreamStatus()));
-                } catch (NotFoundException e) {
-                    logger.log(Level.WARNING, "Unable to find depends on issue with " + url, e);
-                }
-            }
-
+            upstreamReferences.forEach(issue -> {
+                String fixVersion = context.getFixVersion();
+                boolean inPayload = checkFixVersion(issue, fixVersion) || checkIsReleased(issue) || checkIssueType(issue) || !matchStream(issue, stream);
+                dependsOnIssues.add(new DependsOnIssue(issue.getURL(), issue.getTrackerId().orElse("N/A"),
+                        issue.getSummary().orElse(Constants.NOTAPPLICABLE), issue.getStatus(), issue.getType(),
+                        issue.getStage().getStateMap().entrySet().stream()
+                                .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                        Collections.emptyList(), inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
+                                .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                        issue.getStreamStatus()));
+            });
         }
         data.put(KEY, dependsOnIssues);
     }

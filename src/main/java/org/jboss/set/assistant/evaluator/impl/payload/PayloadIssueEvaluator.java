@@ -22,6 +22,7 @@
 
 package org.jboss.set.assistant.evaluator.impl.payload;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,12 +47,12 @@ public class PayloadIssueEvaluator implements PayloadEvaluator {
 
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
-
         Issue dependencyIssue = context.getIssue();
-
         data.put(KEY, new PayloadIssue(dependencyIssue.getURL(), dependencyIssue.getTrackerId().orElse(Constants.NOTAPPLICABLE), dependencyIssue.getSummary().orElse(Constants.NOTAPPLICABLE),
                 dependencyIssue.getStatus(), dependencyIssue.getType(),
                 dependencyIssue.getStage().getStateMap().entrySet().stream()
-                        .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue())))));
+                        .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                        Collections.emptyList()));
+     // FIXME empty violation collection
     }
 }

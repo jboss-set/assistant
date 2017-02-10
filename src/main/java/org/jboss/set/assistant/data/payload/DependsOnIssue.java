@@ -23,9 +23,11 @@
 package org.jboss.set.assistant.data.payload;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
@@ -39,8 +41,8 @@ public class DependsOnIssue extends PayloadIssue {
     private List<String> fixVersions;
     private Map<String, FlagStatus> streamStatus;
 
-    public DependsOnIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, boolean inPayload, List<String> fixVersions, Map<String, FlagStatus> streamStatus) {
-        super(link, label, summary, status, type, flags);
+    public DependsOnIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations, boolean inPayload, List<String> fixVersions, Map<String, FlagStatus> streamStatus) {
+        super(link, label, summary, status, type, flags, violations);
         this.inPayload = inPayload;
         this.fixVersions = fixVersions;
         this.streamStatus = streamStatus;

@@ -89,20 +89,22 @@ public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
 
         Stream stream = context.getStream();
 
-        Collection<PullRequest> relatedPatches = PatchHomeService.filterRelatedPatch(allPullRequests, stream);
-        Collection<PullRequest> unrelatedPatches = PatchHomeService.filterUnrelatedPatch(allPullRequests, stream);
+        Collection<PullRequest> relatedPullRequests = PatchHomeService.filterRelatedPatch(allPullRequests, stream);
+
+        allPullRequests.removeAll(relatedPullRequests);
+        Collection<PullRequest> unrelatedPullRequests = allPullRequests;
 
         List<AssociatedPullRequest> relatedDataList = new ArrayList<>();
         List<AssociatedPullRequest> unrelatedDataList = new ArrayList<>();
 
-        for (PullRequest pullRequest : relatedPatches) {
+        for (PullRequest pullRequest : relatedPullRequests) {
             boolean isNoUpstreamRequired = PatchHomeService.isNoUpstreamRequired(pullRequest);
             Optional<CommitStatus> commitStatus = PatchHomeService.retrieveCommitStatus(pullRequest);
             relatedDataList.add(new AssociatedPullRequest(pullRequest.getId(), pullRequest.getURL(), pullRequest.getCodebase().getName(), pullRequest.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
         }
         data.put(KEY, relatedDataList);
 
-        for (PullRequest pullRequest : unrelatedPatches) {
+        for (PullRequest pullRequest : unrelatedPullRequests) {
             boolean isNoUpstreamRequired = PatchHomeService.isNoUpstreamRequired(pullRequest);
             Optional<CommitStatus> commitStatus = PatchHomeService.retrieveCommitStatus(pullRequest);
             unrelatedDataList.add(new AssociatedPullRequest(pullRequest.getId(), pullRequest.getURL(), pullRequest.getCodebase().getName(), pullRequest.getState().toString(),commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));

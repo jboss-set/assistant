@@ -22,15 +22,10 @@
 
 package org.jboss.set.assistant.evaluator;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,8 +39,6 @@ import org.jboss.set.aphrodite.domain.Issue;
 public final class Util {
     private Util() {
     }
-
-    private static Logger logger = Logger.getLogger(Util.class.getCanonicalName());
 
     private static final Pattern patternStreamFlagBuzilla = Pattern.compile("jboss-eap-[0-9]\\.[0-9]\\.[0-9z]");
     private static final Pattern patternStreamFlagJira = Pattern.compile("[0-9]\\.[a-zA-Z]*(\\.[0-9z])?(\\.[a-zA-Z]*)?");
@@ -75,14 +68,5 @@ public final class Util {
         } else {
             return null;
         }
-    }
-
-    public static URI convertURLtoURI(URL url) {
-        try {
-            return url.toURI();
-        } catch (URISyntaxException e) {
-            logger.log(Level.WARNING, "Error to convert URI from url : " + url, e);
-        }
-        return null;
     }
 }

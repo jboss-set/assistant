@@ -22,6 +22,8 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
+import static org.jboss.set.assistant.Util.convertURLtoURI;
+
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.domain.Repository;
@@ -31,7 +33,6 @@ import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.LinkData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
-import org.jboss.set.assistant.evaluator.Util;
 
 import java.net.URI;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class RepositoryEvaluator implements Evaluator {
         PullRequest pullRequest = context.getPullRequest();
         StreamComponent streamComponent;
         Optional<String> componentName = Optional.of(Constants.NOTAPPLICABLE);
-        URI uri = Util.convertURLtoURI(pullRequest.getRepository().getURL());
+        URI uri = convertURLtoURI(pullRequest.getRepository().getURL());
         if (uri != null) {
             try {
                 streamComponent = aphrodite.getComponentBy(uri, pullRequest.getCodebase());

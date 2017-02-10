@@ -22,7 +22,10 @@
 
 package org.jboss.set.assistant;
 
+import static org.jboss.set.assistant.Util.convertURLtoURI;
+
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,15 +133,16 @@ public class PatchHomeService implements PatchHome {
         return pullRequest.stream().filter(e -> filterByStream(e, stream)).collect(Collectors.toSet());
     }
 
-    public static Collection<PullRequest> filterUnrelatedPatch(Collection<PullRequest> pullRequest, Stream stream) {
-        return pullRequest.stream().filter(e -> !filterByStream(e, stream)).collect(Collectors.toSet());
-    }
-
     public static boolean filterByStream(PullRequest pullRequest, Stream stream) {
         Codebase codebase = pullRequest.getCodebase();
         Repository repository = pullRequest.getRepository();
-        return stream.getAllComponents().stream()
-                .anyMatch(e -> e.getCodebase().equals(codebase) && e.getRepositoryURL().equals(repository.getURL()));
+        URI uri = convertURLtoURI(repository.getURL());
+        if (uri != null) {
+            return stream.getAllComponents().stream()
+                    .anyMatch(e -> e.getCodebase().equals(codebase) && e.getRepositoryURL().equals(uri));
+        } else {
+            return false;
+        }
     }
 
     public static boolean isNoUpstreamRequired(PullRequest pullRequest) {

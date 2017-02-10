@@ -22,6 +22,8 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
+import static org.jboss.set.assistant.Util.convertURLtoURI;
+
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.CommitStatus;
 import org.jboss.set.aphrodite.domain.PullRequest;
@@ -31,7 +33,6 @@ import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.PullRequestData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
-import org.jboss.set.assistant.evaluator.Util;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class PullRequestRelatedEvaluator implements Evaluator {
 
         List<PullRequestData> links = new ArrayList<>();
         for (PullRequest pullRequest : relatedPatches) {
-            URI uri = Util.convertURLtoURI(pullRequest.getRepository().getURL());
+            URI uri = convertURLtoURI(pullRequest.getRepository().getURL());
             if (uri != null) {
                 List<Stream> streams = aphrodite.getStreamsBy(uri, pullRequest.getCodebase());
                 List<String> streamsStr = streams.stream().map(e -> e.getName()).collect(Collectors.toList());

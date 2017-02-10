@@ -22,6 +22,8 @@
 
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
+import static org.jboss.set.assistant.Util.convertURLtoURI;
+
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.PullRequest;
@@ -66,7 +68,7 @@ public class IssuesRelatedEvaluator implements Evaluator {
         Aphrodite aphrodite = context.getAphrodite();
         PullRequest pullRequest = context.getPullRequest();
 
-        URI uri = Util.convertURLtoURI(pullRequest.getRepository().getURL());
+        URI uri = convertURLtoURI(pullRequest.getRepository().getURL());
         if (uri != null) {
             List<String> streams = aphrodite.getStreamsBy(uri, pullRequest.getCodebase()).stream().map(e -> e.getName())
                     .collect(Collectors.toList());

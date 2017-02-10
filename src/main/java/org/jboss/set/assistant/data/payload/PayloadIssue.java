@@ -23,8 +23,10 @@
 package org.jboss.set.assistant.data.payload;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
+import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
 
@@ -39,14 +41,16 @@ public class PayloadIssue {
     private IssueStatus status;
     private IssueType type;
     private Map<String, String> flags;
+    private Collection<Violation> violations;
 
-    public PayloadIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags) {
+    public PayloadIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations) {
         this.link = link;
         this.label = label;
         this.summary = summary;
         this.status = status;
         this.type = type;
         this.flags = flags;
+        this.violations = violations;
     }
 
     public URL getLink() {
@@ -71,5 +75,9 @@ public class PayloadIssue {
 
     public Map<String, String> getFlags() {
         return flags;
+    }
+
+    public Collection<Violation> getViolations() {
+        return violations;
     }
 }
