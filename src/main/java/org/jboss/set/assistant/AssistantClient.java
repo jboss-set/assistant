@@ -55,8 +55,10 @@ public class AssistantClient {
         }
         PatchHomeService patchHomeService = new PatchHomeService();
         IssueHomeService issueHomeService = new IssueHomeService();
+        ViolationHomeService violationHomeService = new ViolationHomeService();
         simpleContainer.register(PatchHome.class.getSimpleName(), patchHomeService);
         simpleContainer.register(IssueHome.class.getSimpleName(), issueHomeService);
+        simpleContainer.register(ViolationHome.class.getSimpleName(), violationHomeService);
     }
 
     public static synchronized Aphrodite getAphrodite() throws AphroditeException {
