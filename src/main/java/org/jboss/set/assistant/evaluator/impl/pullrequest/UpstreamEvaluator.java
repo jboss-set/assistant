@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
 
@@ -45,10 +45,10 @@ public class UpstreamEvaluator implements Evaluator {
 
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
-        Patch patch = context.getPatch();
-        Set<Patch> related = context.getRelated();
+        PullRequest pullRequest = context.getPullRequest();
+        Set<PullRequest> related = context.getRelated();
 
-        if (!UPSTREAM_NOT_REQUIRED.matcher(patch.getBody()).find()) {
+        if (!UPSTREAM_NOT_REQUIRED.matcher(pullRequest.getBody()).find()) {
             if (!related.isEmpty()) {
                 data.put("messages", "missing upstream issue link");
             }

@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.domain.Repository;
 import org.jboss.set.aphrodite.domain.Stream;
 
@@ -36,21 +36,17 @@ import org.jboss.set.aphrodite.domain.Stream;
  */
 public class EvaluatorContext {
     private Aphrodite aphrodite;
-
-    private Patch patch;
-
+    private PullRequest pullRequest;
     private Set<Issue> issues;
-
-    private Set<Patch> related;
-
+    private Set<PullRequest> related;
     private Repository repository;
 
     private Stream stream;
 
-    public EvaluatorContext(Aphrodite aphrodite, Repository repository, Patch patch,
-            Set<Issue> issues, Set<Patch> related, Stream stream) {
+    public EvaluatorContext(Aphrodite aphrodite, Repository repository, PullRequest pullRequest, Set<Issue> issues,
+            Set<PullRequest> related, Stream stream) {
         this.aphrodite = aphrodite;
-        this.patch = patch;
+        this.pullRequest = pullRequest;
         this.issues = issues;
         this.related = related;
         this.repository = repository;
@@ -61,19 +57,19 @@ public class EvaluatorContext {
         return aphrodite;
     }
 
-    public Patch getPatch() {
-        return patch;
+    public PullRequest getPullRequest() {
+        return pullRequest;
     }
 
     public String getBranch() {
-        return patch.getCodebase().getName();
+        return pullRequest.getCodebase().getName();
     }
 
     public Set<Issue> getIssues() {
         return issues;
     }
 
-    public Set<Patch> getRelated() {
+    public Set<PullRequest> getRelated() {
         return related;
     }
 

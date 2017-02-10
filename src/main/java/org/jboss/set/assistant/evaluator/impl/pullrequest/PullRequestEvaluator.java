@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.CommitStatus;
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.AssociatedPullRequest;
@@ -52,23 +52,23 @@ public class PullRequestEvaluator implements Evaluator {
 
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
-        Patch patch = context.getPatch();
+        PullRequest pullRequest = context.getPullRequest();
         boolean isNoUpstreamRequired = false;
-        isNoUpstreamRequired = isNoUpstreamRequired(patch);
+        isNoUpstreamRequired = isNoUpstreamRequired(pullRequest);
         Aphrodite aphrodite = context.getAphrodite();
         Optional<CommitStatus> commitStatus = Optional.of(CommitStatus.UNKNOWN);
         try {
-            commitStatus = Optional.of(aphrodite.getCommitStatusFromPatch(patch));
+            commitStatus = Optional.of(aphrodite.getCommitStatusFromPullRequest(pullRequest));
         } catch (NotFoundException e) {
-            logger.log(Level.FINE, "Unable to find build result for pull request : " + patch.getURL(), e);
+            logger.log(Level.FINE, "Unable to find build result for pull request : " + pullRequest.getURL(), e);
         }
-        data.put("pullRequest", new AssociatedPullRequest(patch.getId(), patch.getURL(), patch.getCodebase().getName(),
-                patch.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
+        data.put("pullRequest", new AssociatedPullRequest(pullRequest.getId(), pullRequest.getURL(), pullRequest.getCodebase().getName(),
+                pullRequest.getState().toString(), commitStatus.orElse(CommitStatus.UNKNOWN).toString(), isNoUpstreamRequired));
 
     }
 
-    private boolean isNoUpstreamRequired(Patch p) {
-        Optional<String> pullRequestBoday = Optional.ofNullable(p.getBody());
+    private boolean isNoUpstreamRequired(PullRequest pullRequest) {
+        Optional<String> pullRequestBoday = Optional.ofNullable(pullRequest.getBody());
         Matcher matcher = Constants.UPSTREAM_NOT_REQUIRED.matcher(pullRequestBoday.orElse("N/A"));
         if (matcher.find())
             return true;

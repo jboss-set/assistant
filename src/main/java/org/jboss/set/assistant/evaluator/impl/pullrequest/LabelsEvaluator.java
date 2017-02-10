@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import org.jboss.set.aphrodite.domain.Flag;
 import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.Issue;
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.assistant.data.LabelData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
@@ -55,12 +55,12 @@ public class LabelsEvaluator implements Evaluator {
     @Override
     public void eval(EvaluatorContext context, Map<String, Object> data) {
 
-        Patch patch = context.getPatch();
+        PullRequest pullRequest = context.getPullRequest();
         Set<Issue> issues = context.getIssues();
 
         // if there aren't any bug related then we show a message
         if (issues.isEmpty()) {
-            logger.log(Level.WARNING, "No issues found in patch, " + name() + " not applied to " + patch.getURL());
+            logger.log(Level.WARNING, "No issues found in patch, " + name() + " not applied to " + pullRequest.getURL());
         }
 
         Map<String, List<LabelData>> labels = new HashMap<>();

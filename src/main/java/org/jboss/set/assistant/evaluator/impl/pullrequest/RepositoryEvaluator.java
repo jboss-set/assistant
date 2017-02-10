@@ -23,7 +23,7 @@
 package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
 import org.jboss.set.aphrodite.Aphrodite;
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.domain.Repository;
 import org.jboss.set.aphrodite.domain.StreamComponent;
 import org.jboss.set.aphrodite.spi.NotFoundException;
@@ -56,13 +56,13 @@ public class RepositoryEvaluator implements Evaluator {
     public void eval(EvaluatorContext context, Map<String, Object> data) {
         Repository repository = context.getRepository();
         Aphrodite aphrodite = context.getAphrodite();
-        Patch patch = context.getPatch();
+        PullRequest pullRequest = context.getPullRequest();
         StreamComponent streamComponent;
         Optional<String> componentName = Optional.of(Constants.NOTAPPLICABLE);
-        URI uri = Util.convertURLtoURI(patch.getRepository().getURL());
+        URI uri = Util.convertURLtoURI(pullRequest.getRepository().getURL());
         if (uri != null) {
             try {
-                streamComponent = aphrodite.getComponentBy(uri, patch.getCodebase());
+                streamComponent = aphrodite.getComponentBy(uri, pullRequest.getCodebase());
                 componentName = Optional.of(streamComponent.getName());
             } catch (NotFoundException e) {
                 logger.log(Level.WARNING, e.getMessage(), e);

@@ -25,6 +25,9 @@ package org.jboss.set.assistant;
 import java.util.logging.Logger;
 
 import org.jboss.set.aphrodite.Aphrodite;
+import org.jboss.set.aphrodite.domain.spi.IssueHome;
+import org.jboss.set.aphrodite.domain.spi.PatchHome;
+import org.jboss.set.aphrodite.simplecontainer.SimpleContainer;
 import org.jboss.set.aphrodite.spi.AphroditeException;
 
 /**
@@ -35,10 +38,25 @@ public class AssistantClient {
 
     private static Logger logger = Logger.getLogger(AssistantClient.class.getCanonicalName());
 
+    private static final SimpleContainer simpleContainer = (SimpleContainer) SimpleContainer.instance();
+
     private static Aphrodite aphrodite;
 
     private AssistantClient() {
         logger.info("starting AssistantClient.");
+    }
+
+    static {
+        try {
+            simpleContainer.register(Aphrodite.class.getSimpleName(), getAphrodite());
+        } catch (AphroditeException e) {
+            // FIXME
+            e.printStackTrace();
+        }
+        PatchHomeService patchHomeService = new PatchHomeService();
+        IssueHomeService issueHomeService = new IssueHomeService();
+        simpleContainer.register(PatchHome.class.getSimpleName(), patchHomeService);
+        simpleContainer.register(IssueHome.class.getSimpleName(), issueHomeService);
     }
 
     public static synchronized Aphrodite getAphrodite() throws AphroditeException {

@@ -24,7 +24,7 @@ package org.jboss.set.assistant.evaluator.impl.pullrequest;
 
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.Issue;
-import org.jboss.set.aphrodite.domain.Patch;
+import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.IssueData;
@@ -64,11 +64,11 @@ public class IssuesRelatedEvaluator implements Evaluator {
 
         Stream currentStream = context.getStream();
         Aphrodite aphrodite = context.getAphrodite();
-        Patch patch = context.getPatch();
+        PullRequest pullRequest = context.getPullRequest();
 
-        URI uri = Util.convertURLtoURI(patch.getRepository().getURL());
+        URI uri = Util.convertURLtoURI(pullRequest.getRepository().getURL());
         if (uri != null) {
-            List<String> streams = aphrodite.getStreamsBy(uri, patch.getCodebase()).stream().map(e -> e.getName())
+            List<String> streams = aphrodite.getStreamsBy(uri, pullRequest.getCodebase()).stream().map(e -> e.getName())
                     .collect(Collectors.toList());
 
             if (currentStream.getName().contains("eap-6")) {

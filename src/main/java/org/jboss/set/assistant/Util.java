@@ -25,6 +25,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -93,4 +94,33 @@ public class Util {
         return dateFormat.format(date);
     }
 
+    @FunctionalInterface
+    public interface SupplierWithException<T> {
+
+        /**
+         * Gets a result.
+         *
+         * @return a result
+         */
+        T get() throws Exception;
+    }
+
+    public static <T> T fetch(final Object source, final String fieldName, final Class<T> resultClass) throws NoSuchFieldException {
+        return fetch(source, source.getClass(), fieldName, resultClass);
+    }
+
+    public static <T> T fetch(final Object source, final Class<?> declaringClass, final String fieldName, final Class<T> resultClass) throws NoSuchFieldException {
+        final Field field = declaringClass.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return resultClass.cast(unchecked(() -> field.get(source)));
+    }
+
+    public static <T> T unchecked(final SupplierWithException<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (final Exception e) {
+            if (e instanceof RuntimeException) throw (RuntimeException) e;
+            throw new RuntimeException(e);
+        }
+    }
 }
