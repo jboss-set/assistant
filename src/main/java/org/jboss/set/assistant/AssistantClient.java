@@ -22,6 +22,7 @@
 
 package org.jboss.set.assistant;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jboss.set.aphrodite.Aphrodite;
@@ -50,8 +51,7 @@ public class AssistantClient {
         try {
             simpleContainer.register(Aphrodite.class.getSimpleName(), getAphrodite());
         } catch (AphroditeException e) {
-            // FIXME
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Can not get aphrodite due to : ", e);
         }
         PatchHomeService patchHomeService = new PatchHomeService();
         IssueHomeService issueHomeService = new IssueHomeService();

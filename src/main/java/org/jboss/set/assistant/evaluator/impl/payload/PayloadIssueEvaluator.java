@@ -22,12 +22,20 @@
 
 package org.jboss.set.assistant.evaluator.impl.payload;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.naming.NameNotFoundException;
+
+import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.set.aphrodite.domain.Issue;
+import org.jboss.set.aphrodite.simplecontainer.SimpleContainer;
 import org.jboss.set.assistant.Constants;
+import org.jboss.set.assistant.ViolationHome;
 import org.jboss.set.assistant.data.payload.PayloadIssue;
 import org.jboss.set.assistant.evaluator.PayloadEvaluator;
 import org.jboss.set.assistant.evaluator.PayloadEvaluatorContext;
@@ -39,6 +47,7 @@ import org.jboss.set.assistant.evaluator.PayloadEvaluatorContext;
 public class PayloadIssueEvaluator implements PayloadEvaluator {
 
     public static final String KEY = "payloadDependency";
+    private static final Logger logger =  Logger.getLogger(PayloadIssueEvaluator.class.getCanonicalName());
 
     @Override
     public String name() {
@@ -48,11 +57,17 @@ public class PayloadIssueEvaluator implements PayloadEvaluator {
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
         Issue dependencyIssue = context.getIssue();
-        data.put(KEY, new PayloadIssue(dependencyIssue.getURL(), dependencyIssue.getTrackerId().orElse(Constants.NOTAPPLICABLE), dependencyIssue.getSummary().orElse(Constants.NOTAPPLICABLE),
-                dependencyIssue.getStatus(), dependencyIssue.getType(),
-                dependencyIssue.getStage().getStateMap().entrySet().stream()
-                        .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                        Collections.emptyList()));
-     // FIXME empty violation collection
+        List<Violation> violations = new ArrayList<>();
+        try {
+            violations = SimpleContainer.instance().lookup(ViolationHome.class.getSimpleName(), ViolationHome.class).findViolations(dependencyIssue).collect(Collectors.toList());
+        } catch (NameNotFoundException e) {
+            logger.log(Level.SEVERE, "Can not get ViolationHome service due to ", e);
+        }
+        data.put(KEY, new PayloadIssue(dependencyIssue.getURL(),
+                dependencyIssue.getTrackerId().orElse(Constants.NOTAPPLICABLE),
+                dependencyIssue.getSummary().orElse(Constants.NOTAPPLICABLE), dependencyIssue.getStatus(),
+                dependencyIssue.getType(),
+                dependencyIssue.getStage().getStateMap().entrySet().stream().collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                violations));
     }
 }

@@ -22,9 +22,15 @@
 
 package org.jboss.set.assistant;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
+import org.jboss.jbossset.bugclerk.Candidate;
+import org.jboss.jbossset.bugclerk.RuleEngine;
 import org.jboss.jbossset.bugclerk.Violation;
+import org.jboss.jbossset.bugclerk.aphrodite.AphroditeClient;
 import org.jboss.set.aphrodite.domain.Issue;
 
 /**
@@ -32,14 +38,28 @@ import org.jboss.set.aphrodite.domain.Issue;
  *
  */
 public class ViolationHomeService implements ViolationHome {
+    private static final AphroditeClient aphroditeClient;
+
+    static {
+        aphroditeClient = new AphroditeClient();
+    }
 
     /*
      * @see org.jboss.set.assistant.ViolationHome#findViolations(org.jboss.set.aphrodite.domain.Issue)
      */
     @Override
     public Stream<Violation> findViolations(Issue issue) {
-        Stream<Violation> violations = Stream.empty();
-        return violations;
+        // String seesionId = issue.getTrackerId().orElse("unknownId");
+        // KIE_SESSION.getFactHandles(new ClassObjectFilter(Violation.class)).forEach(factHandle -> {
+        // KIE_SESSION.delete(factHandle);
+        // });
+        RuleEngine RULE_ENGINE = new RuleEngine(new HashMap<String, Object>(0), aphroditeClient);
+        Collection<Candidate> candidates = RULE_ENGINE.processBugEntry(Arrays.asList(new Candidate(issue)));
+        RULE_ENGINE.shutdownRuleEngine();
+        if (candidates != null && !candidates.isEmpty()) {
+            return candidates.iterator().next().getViolations().stream();
+        } else {
+            return Stream.empty();
+        }
     }
-
 }

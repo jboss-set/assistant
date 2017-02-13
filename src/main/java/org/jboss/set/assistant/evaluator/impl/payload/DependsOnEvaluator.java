@@ -75,7 +75,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
         List<DependsOnIssue> dependsOnIssues = new ArrayList<>();
 
-        // FIXME empty violations collection
+        // TODO complete violations
         if (context.getTrackerType().equals(TrackerType.BUGZILLA)) {
             Issue payloadTracker = context.getPayloadTracker();
             upstreamReferences.forEach(issue -> {

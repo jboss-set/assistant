@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
+import org.jboss.jbossset.bugclerk.Severity;
 import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
@@ -42,8 +43,10 @@ public class PayloadIssue {
     private IssueType type;
     private Map<String, String> flags;
     private Collection<Violation> violations;
+    private Severity maxSeverity;
 
-    public PayloadIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations) {
+    public PayloadIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags,
+            Collection<Violation> violations) {
         this.link = link;
         this.label = label;
         this.summary = summary;
@@ -51,6 +54,19 @@ public class PayloadIssue {
         this.type = type;
         this.flags = flags;
         this.violations = violations;
+        this.maxSeverity = violations.stream().map(violation -> violation.getLevel()).reduce((severity1, severity2) -> maxSeverity(severity1, severity2)).orElse(null);
+    }
+
+    private Severity maxSeverity(Severity s1, Severity s2) {
+        if (s1 == Severity.BLOCKER || s2 == Severity.BLOCKER)
+            return Severity.BLOCKER;
+        if (s1 == Severity.CRITICAL || s2 == Severity.CRITICAL)
+            return Severity.CRITICAL;
+        if (s1 == Severity.MAJOR || s2 == Severity.MAJOR)
+            return Severity.MAJOR;
+        if (s1 == Severity.MINOR || s2 == Severity.MINOR)
+            return Severity.MINOR;
+        return Severity.TRIVIAL;
     }
 
     public URL getLink() {
@@ -79,5 +95,9 @@ public class PayloadIssue {
 
     public Collection<Violation> getViolations() {
         return violations;
+    }
+
+    public Severity getMaxSeverity() {
+        return maxSeverity;
     }
 }
