@@ -25,7 +25,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,10 +33,17 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import org.jboss.jbossset.bugclerk.Severity;
+import org.jboss.set.assistant.data.ProcessorData;
+import org.jboss.set.assistant.data.payload.PayloadIssue;
+import org.jboss.set.assistant.evaluator.impl.payload.PayloadIssueEvaluator;
 
 /**
  * @author Jason T. Greene
@@ -101,36 +107,6 @@ public class Util {
         return dateFormat.format(date);
     }
 
-    @FunctionalInterface
-    public interface SupplierWithException<T> {
-
-        /**
-         * Gets a result.
-         *
-         * @return a result
-         */
-        T get() throws Exception;
-    }
-
-    public static <T> T fetch(final Object source, final String fieldName, final Class<T> resultClass) throws NoSuchFieldException {
-        return fetch(source, source.getClass(), fieldName, resultClass);
-    }
-
-    public static <T> T fetch(final Object source, final Class<?> declaringClass, final String fieldName, final Class<T> resultClass) throws NoSuchFieldException {
-        final Field field = declaringClass.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return resultClass.cast(unchecked(() -> field.get(source)));
-    }
-
-    public static <T> T unchecked(final SupplierWithException<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (final Exception e) {
-            if (e instanceof RuntimeException) throw (RuntimeException) e;
-            throw new RuntimeException(e);
-        }
-    }
-
     public static URI convertURLtoURI(URL url) {
         try {
             return url.toURI();
@@ -138,5 +114,25 @@ public class Util {
             logger.log(Level.WARNING, "Error to convert URI from url : " + url, e);
         }
         return null;
+    }
+
+    public static Severity maxSeverity(List<ProcessorData> payloadData) {
+        List<Severity> maxSeverityList = payloadData.stream()
+                .filter(s -> ((PayloadIssue) s.getData().get(PayloadIssueEvaluator.KEY)).getMaxSeverity() != null)
+                .map(e -> ((PayloadIssue) e.getData().get(PayloadIssueEvaluator.KEY)).getMaxSeverity())
+                .collect(Collectors.toList());
+        return maxSeverityList.stream().reduce((severity1, severity2) -> maxSeverity(severity1, severity2)).orElse(null);
+    }
+
+    public static Severity maxSeverity(Severity s1, Severity s2) {
+        if (s1 == Severity.BLOCKER || s2 == Severity.BLOCKER)
+            return Severity.BLOCKER;
+        if (s1 == Severity.CRITICAL || s2 == Severity.CRITICAL)
+            return Severity.CRITICAL;
+        if (s1 == Severity.MAJOR || s2 == Severity.MAJOR)
+            return Severity.MAJOR;
+        if (s1 == Severity.MINOR || s2 == Severity.MINOR)
+            return Severity.MINOR;
+        return Severity.TRIVIAL;
     }
 }
