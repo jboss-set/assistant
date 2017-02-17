@@ -38,6 +38,6 @@ public interface PayloadProcessor extends Processor {
     List<ProcessorData> process(Issue issue, Stream stream) throws ProcessorException;
 
     // EAP 7 + Jira
-    List<ProcessorData> process(String fixVersion, Stream stream) throws ProcessorException;
+    List<ProcessorData> process(String fixVersion, List<Issue> dependencyIssues, Stream stream) throws ProcessorException;
 
 }
