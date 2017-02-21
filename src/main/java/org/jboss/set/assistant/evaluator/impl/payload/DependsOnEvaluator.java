@@ -84,8 +84,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                         issue.getSummary().orElse(Constants.NOTAPPLICABLE), issue.getStatus(), issue.getType(),
                         issue.getStage().getStateMap().entrySet().stream()
                                 .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                        Collections.emptyList(), inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
-                                .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                        Collections.emptyList(), inPayload, getFixVersions(issue), getPayload(issue),
                         issue.getStreamStatus()));
             });
         } else {
@@ -96,8 +95,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
                         issue.getSummary().orElse(Constants.NOTAPPLICABLE), issue.getStatus(), issue.getType(),
                         issue.getStage().getStateMap().entrySet().stream()
                                 .collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
-                        Collections.emptyList(), inPayload, issue.getReleases().stream().filter(e -> e.getVersion().isPresent())
-                                .map(e -> e.getVersion().get()).collect(Collectors.toList()),
+                        Collections.emptyList(), inPayload, getFixVersions(issue), getPayload(issue),
                         issue.getStreamStatus()));
             });
         }
@@ -158,5 +156,15 @@ public class DependsOnEvaluator implements PayloadEvaluator {
         if (!(api || browse))
             throw new NotFoundException("The URL path must be of the form '" + Constants.API_ISSUE_PATH + "' OR '" + Constants.BROWSE_ISSUE_PATH + "'");
         return api ? path.substring(Constants.API_ISSUE_PATH.length()) : path.substring(Constants.BROWSE_ISSUE_PATH.length());
+    }
+
+    private List<String> getFixVersions(Issue issue){
+        return issue.getReleases().stream().filter(e -> e.getVersion().isPresent()).map(e -> e.getVersion().get()).collect(Collectors.toList());
+    }
+
+    private String getPayload(Issue issue) {
+        List<String> fixVersions = getFixVersions(issue);
+        Optional<String> payload = fixVersions.stream().filter(e -> (e.matches(Constants.EAP64XPAYLOADPATTERN.toString()) || e.matches(Constants.EAP70XPAYLOADPATTERN.toString()))).findFirst();
+        return payload.orElse(Constants.NOTAPPLICABLE);
     }
 }

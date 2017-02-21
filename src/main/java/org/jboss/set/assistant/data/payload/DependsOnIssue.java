@@ -39,12 +39,14 @@ import org.jboss.set.aphrodite.domain.IssueType;
 public class DependsOnIssue extends PayloadIssue {
     private boolean inPayload;
     private List<String> fixVersions;
+    private String payload;
     private Map<String, FlagStatus> streamStatus;
 
-    public DependsOnIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations, boolean inPayload, List<String> fixVersions, Map<String, FlagStatus> streamStatus) {
+    public DependsOnIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations, boolean inPayload, List<String> fixVersions, String payload, Map<String, FlagStatus> streamStatus) {
         super(link, label, summary, status, type, flags, violations);
         this.inPayload = inPayload;
         this.fixVersions = fixVersions;
+        this.payload = payload;
         this.streamStatus = streamStatus;
     }
 
@@ -54,6 +56,10 @@ public class DependsOnIssue extends PayloadIssue {
 
     public List<String> getFixVersions() {
         return fixVersions;
+    }
+
+    public String getPayload() {
+        return payload;
     }
 
     public Map<String, FlagStatus> getStreamStatus() {

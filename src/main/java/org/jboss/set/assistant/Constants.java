@@ -31,6 +31,8 @@ public class Constants {
             .compile(".*github\\.com.*?/([a-zA-Z_0-9-]*)/([a-zA-Z_0-9-]*)/pull.?/(\\d+)", Pattern.CASE_INSENSITIVE);
 
     public static final Pattern BZ_ID_PARAM_PATTERN = Pattern.compile("id=([^&]+)");
+    public static final Pattern EAP64XPAYLOADPATTERN = Pattern.compile("eap([0-9]*)-payload");
+    public static final Pattern EAP70XPAYLOADPATTERN = Pattern.compile("7.0.([0-9]*).GA");
 
     public static final String API_BASE_PATH = "/rest/api/2/";
     public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
@@ -45,5 +47,4 @@ public class Constants {
     public static final String EAP64ZSTREAM = "jboss-eap-6.4.z";
 
     public static final String NOTAPPLICABLE = "N/A";
-
 }
