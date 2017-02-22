@@ -158,6 +158,12 @@
 			<groupId>org.jboss.jbossset</groupId>
 			<artifactId>bugclerk</artifactId>
 			<version>${version.org.jboss.jbossset.bugclerk}</version>
+			<exclusions>
+				<exclusion>
+				<groupId>org.jboss.set</groupId>
+				<artifactId>aphrodite</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
