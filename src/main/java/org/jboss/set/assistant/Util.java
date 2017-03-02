@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.jboss.jbossset.bugclerk.Severity;
+import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.assistant.data.ProcessorData;
 import org.jboss.set.assistant.data.payload.PayloadIssue;
 import org.jboss.set.assistant.evaluator.impl.payload.PayloadIssueEvaluator;
@@ -134,5 +135,39 @@ public class Util {
         if (s1 == Severity.MINOR || s2 == Severity.MINOR)
             return Severity.MINOR;
         return Severity.TRIVIAL;
+    }
+
+    public static Color convertSeverityToColor(Severity s) {
+        if (s == Severity.BLOCKER)
+            return Color.RED;
+        if (s == Severity.CRITICAL)
+            return Color.ORANGE;
+        if (s == Severity.MAJOR)
+            return Color.YELLOW;
+        if (s == Severity.MINOR)
+            return Color.BLUE;
+        if (s == Severity.TRIVIAL)
+            return Color.GRAY;
+        return null;
+    }
+
+    public static List<ProcessorData> filterBySelectedStatus(List<ProcessorData> payloadData, List<String> selectedStatus) {
+        return payloadData.stream().filter(e -> {
+            Severity s = ((PayloadIssue) e.getData().get(PayloadIssueEvaluator.KEY)).getMaxSeverity();
+            if (s == null && selectedStatus.contains(String.valueOf(Color.GREEN)))
+                return true;
+            else
+                return selectedStatus.contains(String.valueOf(convertSeverityToColor(s)));
+        }).collect(Collectors.toList());
+    }
+
+    public static List<ProcessorData> filterByMissedFlags(List<ProcessorData> payloadData, List<String> missedFlags) {
+        return payloadData.stream().filter(e -> {
+            Map<String, String> flags = ((PayloadIssue) e.getData().get(PayloadIssueEvaluator.KEY)).getFlags();
+            if (flags.isEmpty())
+                return true;
+            else
+                return flags.keySet().stream().anyMatch(k -> (missedFlags.contains(k) && flags.get(k) != String.valueOf(FlagStatus.ACCEPTED)));
+        }).collect(Collectors.toList());
     }
 }
