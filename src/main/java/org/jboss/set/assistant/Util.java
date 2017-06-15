@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jboss.jbossset.bugclerk.Severity;
+import org.jboss.set.aphrodite.domain.Flag;
 import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.assistant.data.ProcessorData;
@@ -204,5 +205,25 @@ public class Util {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Check PM, DEV and QE ack for a given issue
+     *
+     * @param The issue to be tested
+     * @return true if all 3 ack are positive, otherwise false.
+     */
+    public static boolean isAllAcks(Issue issue) {
+        for (Flag flag : Flag.values()) {
+            if (issue.getStage() == null) {
+                // no ack is set.
+                return false;
+            }
+            FlagStatus status = issue.getStage().getStatus(flag);
+            if (!status.equals(FlagStatus.ACCEPTED)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

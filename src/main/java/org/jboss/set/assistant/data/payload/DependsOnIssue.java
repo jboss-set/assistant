@@ -43,7 +43,7 @@ public class DependsOnIssue extends PayloadIssue {
     private Map<String, FlagStatus> streamStatus;
 
     public DependsOnIssue(URL link, String label, String summary, IssueStatus status, IssueType type, Map<String, String> flags, Collection<Violation> violations, boolean inPayload, List<String> fixVersions, String payload, Map<String, FlagStatus> streamStatus) {
-        super(link, label, summary, status, type, flags, violations);
+        super(link, label, summary, status, type, flags, false, violations); // for an upstream issue, set allAcks default to false.
         this.inPayload = inPayload;
         this.fixVersions = fixVersions;
         this.payload = payload;

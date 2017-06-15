@@ -71,14 +71,7 @@ public class LabelsEvaluator implements Evaluator {
             List<LabelData> tmp = new ArrayList<>();
             labels.put(issue.getTrackerId().get(), tmp);
 
-            boolean hasAllFlags = true;
-            for (Flag flag : Flag.values()) {
-                FlagStatus status = issue.getStage().getStatus(flag);
-                if (!status.equals(FlagStatus.ACCEPTED)) {
-                    hasAllFlags = false;
-                    break;
-                }
-            }
+            boolean hasAllFlags = Util.isAllAcks(issue);
             boolean hasStreams = !Util.getStreams(issue).isEmpty();
             if (hasStreams) {
                 okays.put(issue.getTrackerId().get(), hasAllFlags ? 1 : 3);

@@ -35,6 +35,7 @@ import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.simplecontainer.SimpleContainer;
 import org.jboss.set.assistant.Constants;
+import org.jboss.set.assistant.Util;
 import org.jboss.set.assistant.ViolationHome;
 import org.jboss.set.assistant.data.payload.PayloadIssue;
 import org.jboss.set.assistant.evaluator.PayloadEvaluator;
@@ -68,6 +69,7 @@ public class PayloadIssueEvaluator implements PayloadEvaluator {
                 dependencyIssue.getSummary().orElse(Constants.NOTAPPLICABLE), dependencyIssue.getStatus(),
                 dependencyIssue.getType(),
                 dependencyIssue.getStage().getStateMap().entrySet().stream().collect(Collectors.toMap(e -> String.valueOf(e.getKey()), e -> String.valueOf(e.getValue()))),
+                Util.isAllAcks(dependencyIssue),
                 violations));
     }
 }
