@@ -29,10 +29,10 @@ import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.PullRequest;
 import org.jboss.set.aphrodite.domain.Stream;
 import org.jboss.set.assistant.Constants;
+import org.jboss.set.assistant.Util;
 import org.jboss.set.assistant.data.IssueData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
-import org.jboss.set.assistant.evaluator.Util;
 
 import java.net.URI;
 import java.util.ArrayList;

@@ -30,18 +30,23 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jboss.jbossset.bugclerk.Severity;
 import org.jboss.set.aphrodite.domain.FlagStatus;
+import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.assistant.data.ProcessorData;
 import org.jboss.set.assistant.data.payload.PayloadIssue;
 import org.jboss.set.assistant.evaluator.impl.payload.PayloadIssueEvaluator;
@@ -50,6 +55,9 @@ import org.jboss.set.assistant.evaluator.impl.payload.PayloadIssueEvaluator;
  * @author Jason T. Greene
  */
 public class Util {
+
+    private static final Pattern patternStreamFlagBuzilla = Pattern.compile("jboss-eap-[0-9]\\.[0-9]\\.[0-9z]");
+    private static final Pattern patternStreamFlagJira = Pattern.compile("[0-9]\\.[a-zA-Z]*(\\.[0-9z])?(\\.[a-zA-Z]*)?");
 
     private static Logger logger = Logger.getLogger(Util.class.getCanonicalName());
 
@@ -169,5 +177,32 @@ public class Util {
             else
                 return flags.keySet().stream().anyMatch(k -> (missedFlags.contains(k) && flags.get(k) != String.valueOf(FlagStatus.ACCEPTED)));
         }).collect(Collectors.toList());
+    }
+
+    public static List<String> getStreams(Issue issue) {
+
+        EnumSet<FlagStatus> set = EnumSet.of(FlagStatus.ACCEPTED, FlagStatus.SET);
+        List<String> streams = new ArrayList<>();
+        Map<String, FlagStatus> statuses = issue.getStreamStatus();
+        for (Map.Entry<String, FlagStatus> status : statuses.entrySet()) {
+            String stream = extract(status.getKey());
+            if (stream != null && set.contains(status.getValue())) {
+                streams.add(stream);
+            }
+        }
+        return streams;
+    }
+
+    public static String extract(String value) {
+        Matcher matcherBugzilla = patternStreamFlagBuzilla.matcher(value);
+        Matcher matcherJira = patternStreamFlagJira.matcher(value);
+        if (matcherBugzilla.find()) {
+            String bugzilla = matcherBugzilla.group();
+            return bugzilla;
+        } else if (matcherJira.find()) {
+            return matcherJira.group();
+        } else {
+            return null;
+        }
     }
 }

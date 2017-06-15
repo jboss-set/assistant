@@ -34,10 +34,10 @@ import org.jboss.set.aphrodite.domain.Flag;
 import org.jboss.set.aphrodite.domain.FlagStatus;
 import org.jboss.set.aphrodite.domain.Issue;
 import org.jboss.set.aphrodite.domain.PullRequest;
+import org.jboss.set.assistant.Util;
 import org.jboss.set.assistant.data.LabelData;
 import org.jboss.set.assistant.evaluator.Evaluator;
 import org.jboss.set.assistant.evaluator.EvaluatorContext;
-import org.jboss.set.assistant.evaluator.Util;
 
 /**
  * @author egonzalez
