@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.spi.IssueHome;
 import org.jboss.set.aphrodite.domain.spi.PatchHome;
+import org.jboss.set.aphrodite.issue.trackers.jira.JiraIssueHomeImpl;
 import org.jboss.set.aphrodite.simplecontainer.SimpleContainer;
 import org.jboss.set.aphrodite.spi.AphroditeException;
 
@@ -54,7 +55,7 @@ public class AssistantClient {
             logger.log(Level.SEVERE, "Can not get aphrodite due to : ", e);
         }
         PatchHomeService patchHomeService = new PatchHomeService();
-        IssueHomeService issueHomeService = new IssueHomeService();
+        JiraIssueHomeImpl  issueHomeService = new JiraIssueHomeImpl();
         ViolationHomeService violationHomeService = new ViolationHomeService();
         simpleContainer.register(PatchHome.class.getSimpleName(), patchHomeService);
         simpleContainer.register(IssueHome.class.getSimpleName(), issueHomeService);

@@ -34,7 +34,7 @@
 		<commons.beanutils.version>1.9.2</commons.beanutils.version>
 		<javax.json.version>1.0.4</javax.json.version>
 		<version.org.jboss.jbossset.bugclerk>0.10.0.Final</version.org.jboss.jbossset.bugclerk>
-		<version.org.jboss.set.aphrodite>0.7.2.Final</version.org.jboss.set.aphrodite>
+		<version.org.jboss.set.aphrodite>0.7.4.Final</version.org.jboss.set.aphrodite>
 		<junit.version>4.12</junit.version>
 		<org.mockito.version>1.10.19</org.mockito.version>
 		<org.wildfly.checkstyle-config.version>1.0.4.Final</org.wildfly.checkstyle-config.version>

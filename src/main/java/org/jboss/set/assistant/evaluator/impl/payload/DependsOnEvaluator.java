@@ -25,15 +25,18 @@ package org.jboss.set.assistant.evaluator.impl.payload;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.naming.NameNotFoundException;
 
+import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.common.Utils;
 import org.jboss.set.aphrodite.config.TrackerType;
 import org.jboss.set.aphrodite.domain.Issue;
@@ -41,6 +44,7 @@ import org.jboss.set.aphrodite.domain.IssueStatus;
 import org.jboss.set.aphrodite.domain.IssueType;
 import org.jboss.set.aphrodite.domain.Release;
 import org.jboss.set.aphrodite.domain.Stream;
+import org.jboss.set.aphrodite.issue.trackers.jira.JiraIssue;
 import org.jboss.set.aphrodite.spi.NotFoundException;
 import org.jboss.set.assistant.Constants;
 import org.jboss.set.assistant.data.payload.DependsOnIssue;
@@ -64,11 +68,26 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
     @Override
     public void eval(PayloadEvaluatorContext context, Map<String, Object> data) {
+        Aphrodite aphrodite = context.getAphrodite();
         Issue dependencyIssue = context.getIssue();
         Stream stream = context.getStream();
         java.util.stream.Stream<Issue> upstreamReferences = java.util.stream.Stream.empty();
         try {
-            upstreamReferences = dependencyIssue.getUpstreamReferences();
+            if (dependencyIssue instanceof JiraIssue) {
+                upstreamReferences = dependencyIssue.getUpstreamReferences();
+            } else {
+                // workaround, only JiraIssueHomeImpl implements the upstream reference logic, Bugzilla uses simple getDependsOn() for now.
+                Set<Issue> upstreamIssues = new HashSet<>();
+                for (URL url : dependencyIssue.getDependsOn()) {
+                    try {
+                        upstreamIssues.add(aphrodite.getIssue(url));
+                    } catch (NotFoundException e) {
+                        logger.log(Level.WARNING, "Unable to find issue with url: " + url, e);
+                    }
+                }
+                if (!upstreamIssues.isEmpty())
+                    upstreamReferences = upstreamIssues.stream();
+            }
         } catch (NameNotFoundException e) {
             logger.log(Level.SEVERE, "Unable to load service due to " + e.getMessage(), e);
         }
