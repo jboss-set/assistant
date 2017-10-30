@@ -32,7 +32,7 @@ public class Constants {
 
     public static final Pattern BZ_ID_PARAM_PATTERN = Pattern.compile("id=([^&]+)");
     public static final Pattern EAP64XPAYLOADPATTERN = Pattern.compile("eap([0-9]*)-payload");
-    public static final Pattern EAP70XPAYLOADPATTERN = Pattern.compile("7.0.([0-9]*).GA");
+    public static final Pattern EAP70XPAYLOADPATTERN = Pattern.compile("(7.0.[0-9]*).GA");
 
     public static final String API_BASE_PATH = "/rest/api/2/";
     public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
