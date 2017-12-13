@@ -55,8 +55,8 @@ import javax.naming.NameNotFoundException;
  */
 public class AssociatedPullRequestEvaluator implements PayloadEvaluator {
     private static final Logger logger = Logger.getLogger(AssociatedPullRequestEvaluator.class.getCanonicalName());
-    public static final String KEY = "associatedPullRequest";
-    public static final String KEY_UNRELATED = "associatedUnrelatedPullRequest";
+    private static final String KEY = "associatedPullRequest";
+    private static final String KEY_UNRELATED = "associatedUnrelatedPullRequest";
 
     @Override
     public String name() {

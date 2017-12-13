@@ -31,20 +31,25 @@ public class Constants {
             .compile(".*github\\.com.*?/([a-zA-Z_0-9-]*)/([a-zA-Z_0-9-]*)/pull.?/(\\d+)", Pattern.CASE_INSENSITIVE);
 
     public static final Pattern BZ_ID_PARAM_PATTERN = Pattern.compile("id=([^&]+)");
-    public static final Pattern EAP64XPAYLOADPATTERN = Pattern.compile("eap([0-9]*)-payload");
-    public static final Pattern EAP70XPAYLOADPATTERN = Pattern.compile("(7.0.[0-9]*).GA");
+    public static final Pattern EAP64ZPAYLOADPATTERN = Pattern.compile("eap([0-9]*)-payload");
+    public static final Pattern EAP70ZPAYLOADPATTERN = Pattern.compile("7.0.([0-9]*).GA");
+    public static final Pattern EAP71ZPAYLOADPATTERN = Pattern.compile("7.1.([0-9]*).GA");
 
     public static final String API_BASE_PATH = "/rest/api/2/";
     public static final String API_ISSUE_PATH = API_BASE_PATH + "issue/";
     public static final String BROWSE_ISSUE_PATH = "/browse/";
 
     public static final String EAP7_STREAM_TARGET_RELEASE_70ZGA = "7.0.z.GA";
+    public static final String EAP7_STREAM_TARGET_RELEASE_71ZGA = "7.1.z.GA";
     public static final String EAP7_STREAM_TARGET_RELEASE_7BACKLOGGA = "7.backlog.GA";
     public static final String EAP7_STREAM_TARGET_RELEASE_710GA = "7.1.0.GA";
+    public static final String EAP7_STREAM_TARGET_RELEASE_720GA = "7.2.0.GA";
 
-    public static final String EAP70ZSTREAM = "jboss-eap-7.0.z";
-    public static final String EAP7Z0STREAM = "jboss-eap-7.z.0";
     public static final String EAP64ZSTREAM = "jboss-eap-6.4.z";
+    public static final String EAP70ZSTREAM = "jboss-eap-7.0.z";
+    public static final String EAP71ZSTREAM = "jboss-eap-7.1.z";
+    public static final String EAP7Z0STREAM = "jboss-eap-7.z.0";
+
 
     public static final String NOTAPPLICABLE = "N/A";
 }

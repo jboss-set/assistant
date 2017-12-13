@@ -59,7 +59,7 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
     private static final Logger logger = Logger.getLogger(DependsOnEvaluator.class.getCanonicalName());
 
-    public static final String KEY = "dependsOn";
+    private static final String KEY = "dependsOn";
 
     @Override
     public String name() {
@@ -183,7 +183,11 @@ public class DependsOnEvaluator implements PayloadEvaluator {
 
     private String getPayload(Issue issue) {
         List<String> fixVersions = getFixVersions(issue);
-        Optional<String> payload = fixVersions.stream().filter(e -> (e.matches(Constants.EAP64XPAYLOADPATTERN.toString()) || e.matches(Constants.EAP70XPAYLOADPATTERN.toString()))).findFirst();
+        Optional<String> payload = fixVersions.stream()
+                .filter(e -> (e.matches(Constants.EAP64ZPAYLOADPATTERN.toString())
+                        || e.matches(Constants.EAP70ZPAYLOADPATTERN.toString())
+                        || e.matches(Constants.EAP71ZPAYLOADPATTERN.toString())))
+                .findFirst();
         return payload.orElse(Constants.NOTAPPLICABLE);
     }
 }
