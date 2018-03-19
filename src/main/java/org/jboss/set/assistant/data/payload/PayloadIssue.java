@@ -69,7 +69,7 @@ public class PayloadIssue {
     }
 
     public String getSummary() {
-        return summary;
+        return summary.replace("\"", "&quot;"); // JBEAP-14398 double quotes is in summary
     }
 
     public IssueStatus getStatus() {
