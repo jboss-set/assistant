@@ -25,10 +25,13 @@ package org.jboss.set.assistant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 import org.jboss.set.aphrodite.Aphrodite;
 import org.jboss.set.aphrodite.domain.spi.IssueHome;
 import org.jboss.set.aphrodite.domain.spi.PatchHome;
+import org.jboss.set.aphrodite.domain.spi.PullRequestHome;
 import org.jboss.set.aphrodite.issue.trackers.jira.JiraIssueHomeImpl;
+import org.jboss.set.aphrodite.repository.services.github.GithubPullRequestHomeService;
 import org.jboss.set.aphrodite.simplecontainer.SimpleContainer;
 import org.jboss.set.aphrodite.spi.AphroditeException;
 
@@ -57,9 +60,11 @@ public class AssistantClient {
         PatchHomeService patchHomeService = new PatchHomeService();
         JiraIssueHomeImpl  issueHomeService = new JiraIssueHomeImpl();
         ViolationHomeService violationHomeService = new ViolationHomeService();
+        GithubPullRequestHomeService GithubPullRequestHomeService = new GithubPullRequestHomeService(aphrodite);
         simpleContainer.register(PatchHome.class.getSimpleName(), patchHomeService);
         simpleContainer.register(IssueHome.class.getSimpleName(), issueHomeService);
         simpleContainer.register(ViolationHome.class.getSimpleName(), violationHomeService);
+        simpleContainer.register(PullRequestHome.class.getSimpleName(), GithubPullRequestHomeService);
     }
 
     public static synchronized Aphrodite getAphrodite() throws AphroditeException {
