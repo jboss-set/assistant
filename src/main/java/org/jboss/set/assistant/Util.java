@@ -210,7 +210,7 @@ public class Util {
     /**
      * Check PM, DEV and QE ack for a given issue
      *
-     * @param The issue to be tested
+     * @param issue to be tested
      * @return true if all 3 ack are positive, otherwise false.
      */
     public static boolean isAllAcks(Issue issue) {
