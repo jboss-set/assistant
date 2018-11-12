@@ -186,7 +186,8 @@ public class DependsOnEvaluator implements PayloadEvaluator {
         Optional<String> payload = fixVersions.stream()
                 .filter(e -> (e.matches(Constants.EAP64ZPAYLOADPATTERN.toString())
                         || e.matches(Constants.EAP70ZPAYLOADPATTERN.toString())
-                        || e.matches(Constants.EAP71ZPAYLOADPATTERN.toString())))
+                        || e.matches(Constants.EAP71ZPAYLOADPATTERN.toString())
+                        || e.matches(Constants.EAP72ZPAYLOADPATTERN.toString())))
                 .findFirst();
         return payload.orElse(Constants.NOTAPPLICABLE);
     }
