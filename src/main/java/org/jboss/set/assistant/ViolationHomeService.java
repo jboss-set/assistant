@@ -24,11 +24,11 @@ package org.jboss.set.assistant;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.stream.Stream;
 
+import org.jboss.jbossset.bugclerk.BugClerk;
+import org.jboss.jbossset.bugclerk.BugclerkConfiguration;
 import org.jboss.jbossset.bugclerk.Candidate;
-import org.jboss.jbossset.bugclerk.RuleEngine;
 import org.jboss.jbossset.bugclerk.Violation;
 import org.jboss.jbossset.bugclerk.aphrodite.AphroditeClient;
 import org.jboss.set.aphrodite.domain.Issue;
@@ -53,9 +53,9 @@ public class ViolationHomeService implements ViolationHome {
         // KIE_SESSION.getFactHandles(new ClassObjectFilter(Violation.class)).forEach(factHandle -> {
         // KIE_SESSION.delete(factHandle);
         // });
-        RuleEngine RULE_ENGINE = new RuleEngine(new HashMap<String, Object>(0), aphroditeClient);
-        Collection<Candidate> candidates = RULE_ENGINE.processBugEntry(Arrays.asList(new Candidate(issue)));
-        RULE_ENGINE.shutdownRuleEngine();
+        BugclerkConfiguration bugclerkConfig = new BugclerkConfiguration();
+        BugClerk bugClerk = new BugClerk(aphroditeClient, bugclerkConfig);
+        Collection<Candidate> candidates = bugClerk.processEntriesAndReportViolations(Arrays.asList(new Candidate(issue)));
         if (candidates != null && !candidates.isEmpty()) {
             return candidates.iterator().next().getViolations().stream();
         } else {
