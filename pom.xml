@@ -10,7 +10,7 @@
 	<groupId>org.jboss.set</groupId>
 	<artifactId>assistant</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.10.Final-SNAPSHOT</version>
+	<version>0.1.10.Final</version>
 	<name>assistant</name>
 	<description>A shared component to define customized work flow rule and logic to deal with GitHub Pull Request, Jira and Bugzilla issues</description>
 
@@ -18,7 +18,7 @@
 		<connection>scm:git:git://github.com/jboss-set/assistant.git</connection>
 		<developerConnection>scm:git:git@github.com:jboss-set/assistant.git</developerConnection>
 		<url>https://github.com/jboss-set/assistant</url>
-		<tag>HEAD</tag>
+		<tag>assistant-0.1.10.Final</tag>
 	</scm>
 
 	<properties>
